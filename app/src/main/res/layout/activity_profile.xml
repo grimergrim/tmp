@@ -14,7 +14,7 @@
 
     <android.support.constraint.ConstraintLayout
         android:id="@+id/user_layout"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/car_layout"
@@ -62,20 +62,20 @@
             app:layout_constraintLeft_toRightOf="@+id/user_avatar"
             app:layout_constraintTop_toBottomOf="@+id/money"/>
 
-        <EditText
+        <TextView
             android:id="@+id/phoneNumber"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="+380974458797"
             android:textColor="@android:color/black"
             android:textSize="12sp"
             app:layout_constraintLeft_toRightOf="@+id/user_avatar"
-            app:layout_constraintTop_toBottomOf="@+id/phoneNumberTitle"
-            tools:text="+380974458797"/>
+            app:layout_constraintTop_toBottomOf="@+id/phoneNumberTitle"/>
 
         <ImageButton
             android:id="@+id/changePhoneNumberButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:background="@android:color/transparent"
             android:src="@drawable/ic_exit"
             app:layout_constraintLeft_toRightOf="@+id/phoneNumber"
@@ -92,20 +92,20 @@
             app:layout_constraintLeft_toRightOf="@+id/user_avatar"
             app:layout_constraintTop_toBottomOf="@+id/phoneNumber"/>
 
-        <EditText
+        <TextView
             android:id="@+id/email"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="user@gmail.com"
             android:textColor="@android:color/black"
             android:textSize="12sp"
             app:layout_constraintLeft_toRightOf="@+id/user_avatar"
-            app:layout_constraintTop_toBottomOf="@+id/emailTitle"
-            tools:text="user@gmail.com"/>
+            app:layout_constraintTop_toBottomOf="@+id/emailTitle"/>
 
         <ImageButton
             android:id="@+id/changeEmailButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:background="@android:color/transparent"
             android:src="@drawable/ic_exit"
             app:layout_constraintLeft_toRightOf="@+id/email"
@@ -118,7 +118,7 @@
     <android.support.constraint.ConstraintLayout
         android:id="@+id/car_layout"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         android:background="@android:color/darker_gray"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -127,6 +127,14 @@
         app:layout_constraintTop_toBottomOf="@+id/user_layout"
         >
 
+        <android.support.v4.view.ViewPager
+            android:id="@+id/pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
     </android.support.constraint.ConstraintLayout>
 
