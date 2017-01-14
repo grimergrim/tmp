@@ -35,7 +35,6 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     private ImageView mAvatarImageView;
     private ConstraintLayout mCarsConstraintLayout;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +48,8 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         mCarsConstraintLayout = (ConstraintLayout) findViewById(R.id.car_layout);
         if (mCarsConstraintLayout != null)
             mCarsConstraintLayout.setVisibility(View.GONE);
+
+        //TODO add exit and settings buttons action
 
         mProfilePresenter = ProfilePresenterImpl.getPreLoginPresenter();
         mProfilePresenter.setView(this);
