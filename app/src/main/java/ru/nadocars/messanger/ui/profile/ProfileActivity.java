@@ -64,7 +64,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
             userAvatar.setVisibility(View.GONE);
         }
 
-        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager = (ViewPager) findViewById(R.id.car_photo_view_pager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager(), 3);
         mViewPager.setAdapter(mPagerAdapter);
     }
