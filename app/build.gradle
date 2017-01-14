@@ -30,5 +30,5 @@ dependencies {
     compile 'de.hdodenhof:circleimageview:2.0.0'
     //swipe refresh layout bottom
     compile 'com.github.orangegangsters:swipy:1.2.3@aar'
-    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta3'
+    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta4'
 }
