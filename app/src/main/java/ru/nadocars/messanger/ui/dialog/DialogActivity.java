@@ -96,6 +96,13 @@ public class DialogActivity extends AppCompatActivity implements DialogView, Dia
         }
         if (userAvatarView != null) {
             userAvatarView.setVisibility(View.VISIBLE);
+            userAvatarView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent profileIntent = new Intent(getApplicationContext(), ProfileActivity.class);
+                    startActivity(profileIntent);
+                }
+            });
             if (userAvatar != null) {
                 userAvatarView.setImageBitmap(userAvatar);
             }
@@ -106,17 +113,6 @@ public class DialogActivity extends AppCompatActivity implements DialogView, Dia
                 @Override
                 public void onClick(View v) {
                     logOut();
-                }
-            });
-        }
-        Button profileButton = (Button) findViewById(R.id.open_profile);
-        if (null != profileButton) {
-            profileButton.setVisibility(View.VISIBLE);
-            profileButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent profileIntent = new Intent(getApplicationContext(), ProfileActivity.class);
-                    startActivity(profileIntent);
                 }
             });
         }

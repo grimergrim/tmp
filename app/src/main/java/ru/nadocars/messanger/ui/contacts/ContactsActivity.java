@@ -65,6 +65,13 @@ public class ContactsActivity extends AppCompatActivity implements ContactsView,
         if (userAvatar != null) {
             userAvatar.setVisibility(View.VISIBLE);
             setUserAvatarFromInternalMemory(userAvatar);
+            userAvatar.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent profileIntent = new Intent(getApplicationContext(), ProfileActivity.class);
+                    startActivity(profileIntent);
+                }
+            });
         }
         if (exitbutton != null) {
             exitbutton.setVisibility(View.VISIBLE);
@@ -72,17 +79,6 @@ public class ContactsActivity extends AppCompatActivity implements ContactsView,
                 @Override
                 public void onClick(View v) {
                     logOut();
-                }
-            });
-        }
-        Button profileButton = (Button) findViewById(R.id.open_profile);
-        if (null != profileButton) {
-            profileButton.setVisibility(View.VISIBLE);
-            profileButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent profileIntent = new Intent(getApplicationContext(), ProfileActivity.class);
-                    startActivity(profileIntent);
                 }
             });
         }

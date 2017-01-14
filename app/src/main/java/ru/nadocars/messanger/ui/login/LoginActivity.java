@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,7 +20,6 @@ import android.widget.Toast;
 
 import ru.nadocars.messanger.R;
 import ru.nadocars.messanger.api.SharedPreferencesApi;
-import ru.nadocars.messanger.ui.profile.ProfileActivity;
 
 //Клас для работы с экраном логина
 public class LoginActivity extends AppCompatActivity implements LoginView {
@@ -42,7 +40,6 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
         ImageView userAvatar = (ImageView) findViewById(R.id.user_avatar);
         Button exitbutton = (Button) findViewById(R.id.exit_button);
         Button settingsButton = (Button) findViewById(R.id.check_interval);
-        Button openProfileButton = (Button) findViewById(R.id.open_profile);
         if (settingsButton != null) {
             settingsButton.setVisibility(View.GONE);
         }
@@ -51,16 +48,6 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
         }
         if (exitbutton != null) {
             exitbutton.setVisibility(View.GONE);
-        }
-        if (openProfileButton != null) {
-            openProfileButton.setVisibility(View.VISIBLE);
-            openProfileButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent profileIntent = new Intent(getApplicationContext(), ProfileActivity.class);
-                    startActivity(profileIntent);
-                }
-            });
         }
         emailView = (AutoCompleteTextView) findViewById(R.id.email);
         passwordView = (EditText) findViewById(R.id.password);

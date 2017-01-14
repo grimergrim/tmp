@@ -10,7 +10,8 @@ public interface HttpApi {
      * Это константы с адресами апи
      */
 
-    String BASE_URL = "http://nadocars.ru/api/v1.0/";
+    String BASE_URL = "https://nadocars.ru/api/v2.0/";
+    String USER_GET = "user.get/";
     String LOGIN = "user.login/";
     String GET_USER = "user.get/";
     String LOGOUT = "user.logout/";

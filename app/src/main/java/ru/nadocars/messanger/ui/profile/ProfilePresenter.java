@@ -4,6 +4,6 @@ import ru.nadocars.messanger.ui.Presenter;
 
 public interface ProfilePresenter extends Presenter<ProfileView> {
 
-
+    void getUserInfo(String token);
 
 }
