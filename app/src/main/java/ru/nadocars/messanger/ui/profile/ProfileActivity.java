@@ -6,6 +6,7 @@ import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +16,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.prolificinteractive.materialcalendarview.CalendarDay;
+import com.prolificinteractive.materialcalendarview.DayViewDecorator;
+import com.prolificinteractive.materialcalendarview.DayViewFacade;
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.squareup.picasso.Picasso;
 
 import ru.nadocars.messanger.R;
@@ -35,6 +40,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     private EditText mPhoneTextView;
     private ImageView mAvatarImageView;
     private ConstraintLayout mCarsConstraintLayout;
+    private MaterialCalendarView mCalendarView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +53,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         mPhoneTextView = (EditText) findViewById(R.id.phone_number);
         mAvatarImageView = (ImageView) findViewById(R.id.profile_user_avatar);
         mCarsConstraintLayout = (ConstraintLayout) findViewById(R.id.car_layout);
+        mCalendarView = (MaterialCalendarView) findViewById(R.id.calendar_view);
         if (mCarsConstraintLayout != null)
             mCarsConstraintLayout.setVisibility(View.GONE);
 
@@ -68,6 +75,25 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         mViewPager = (ViewPager) findViewById(R.id.car_photo_view_pager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager(), 3);
         mViewPager.setAdapter(mPagerAdapter);
+        initCalendar();
+    }
+
+    private void initCalendar() {
+        if (null != mCalendarView) {
+            mCalendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_NONE);
+            mCalendarView.addDecorator(new DayViewDecorator() {
+                @Override
+                public boolean shouldDecorate(CalendarDay day) {
+                    return true;
+                }
+
+                @Override
+                public void decorate(DayViewFacade view) {
+                    view.setBackgroundDrawable(ContextCompat.getDrawable(getApplicationContext(),
+                            R.drawable.shape_calendar_view));
+                }
+            });
+        }
     }
 
     @Override
