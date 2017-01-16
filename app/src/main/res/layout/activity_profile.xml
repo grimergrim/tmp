@@ -390,7 +390,7 @@
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:background="@android:color/darker_gray"/>
+                        android:background="@color/colorBusyDay"/>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -402,7 +402,7 @@
                         android:layout_height="20dp"
                         android:layout_marginLeft="16dp"
                         android:layout_marginStart="16dp"
-                        android:background="@android:color/darker_gray"/>
+                        android:background="@color/colorFreeDay"/>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -433,12 +433,95 @@
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/calendar_view"/>
 
-                <DatePicker
+                <LinearLayout
+                    android:id="@+id/from_date"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/shape_rounded_borders"
+                    android:padding="4dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/from_title">
 
-                </DatePicker>
+                    <TextView
+                        android:id="@+id/from_date_text_view"
+                        android:layout_width="60dp"
+                        android:layout_height="24dp"/>
 
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_date_range_black_24dp"/>
+
+                </LinearLayout>
+
+                <Spinner
+                    android:id="@+id/from_spinner"
+                    android:layout_width="48dp"
+                    android:layout_height="32dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginStart="16dp"
+                    android:background="@drawable/shape_rounded_borders"
+                    app:layout_constraintBottom_toBottomOf="@+id/from_date"
+                    app:layout_constraintLeft_toRightOf="@+id/from_date"
+                    app:layout_constraintTop_toTopOf="@+id/from_date"/>
+
+                <TextView
+                    android:id="@+id/to_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="До"
+                    android:textColor="@android:color/black"
+                    android:textSize="18sp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/from_date"/>
+
+                <LinearLayout
+                    android:id="@+id/to_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/shape_rounded_borders"
+                    android:padding="4dp"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/to_title">
+
+                    <TextView
+                        android:id="@+id/to_date_text_view"
+                        android:layout_width="60dp"
+                        android:layout_height="24dp"/>
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/ic_date_range_black_24dp"/>
+
+                </LinearLayout>
+
+                <Spinner
+                    android:id="@+id/to_spinner"
+                    android:layout_width="48dp"
+                    android:layout_height="32dp"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginStart="16dp"
+                    android:background="@drawable/shape_rounded_borders"
+                    app:layout_constraintBottom_toBottomOf="@+id/to_date"
+                    app:layout_constraintLeft_toRightOf="@+id/to_date"
+                    app:layout_constraintTop_toTopOf="@+id/to_date"/>
+
+
+                <Button
+                    android:id="@+id/mark_days_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="32dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/shape_green_button"
+                    android:minHeight="32dp"
+                    android:text="Занять"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white"
+                    app:layout_constraintLeft_toLeftOf="@+id/to_date"
+                    app:layout_constraintRight_toRightOf="@+id/to_date"
+                    app:layout_constraintTop_toBottomOf="@+id/to_spinner"/>
 
             </android.support.constraint.ConstraintLayout>
 
