@@ -49,7 +49,7 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
         if (exitbutton != null) {
             exitbutton.setVisibility(View.GONE);
         }
-        emailView = (AutoCompleteTextView) findViewById(R.id.email);
+        emailView = (AutoCompleteTextView) findViewById(R.id.phone_number);
         passwordView = (EditText) findViewById(R.id.password);
         loginFormView = findViewById(R.id.login_form);
         progressView = findViewById(R.id.login_progress);

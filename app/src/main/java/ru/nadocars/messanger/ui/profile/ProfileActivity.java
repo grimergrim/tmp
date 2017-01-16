@@ -10,6 +10,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,8 +31,8 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     private PagerAdapter mPagerAdapter;
     private TextView mNameTextView;
     private TextView mMoneyTextView;
-    private TextView mEmailTextView;
-    private TextView mPhoneTextView;
+    private EditText mEmailTextView;
+    private EditText mPhoneTextView;
     private ImageView mAvatarImageView;
     private ConstraintLayout mCarsConstraintLayout;
 
@@ -42,8 +43,8 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         //Find views
         mNameTextView = (TextView) findViewById(R.id.user_name);
         mMoneyTextView = (TextView) findViewById(R.id.money);
-        mEmailTextView = (TextView) findViewById(R.id.email);
-        mPhoneTextView = (TextView) findViewById(R.id.phoneNumber);
+        mEmailTextView = (EditText) findViewById(R.id.email);
+        mPhoneTextView = (EditText) findViewById(R.id.phone_number);
         mAvatarImageView = (ImageView) findViewById(R.id.profile_user_avatar);
         mCarsConstraintLayout = (ConstraintLayout) findViewById(R.id.car_layout);
         if (mCarsConstraintLayout != null)
