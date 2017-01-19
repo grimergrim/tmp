@@ -19,6 +19,7 @@ public interface HttpApi {
     String GET_DIALOG = "dialog.get/";
     String DIALOG_POST = "dialog.post/";
     String DIALOG_READED = "dialog.readed/";
+    String USER_UPDATE = "user.update/";
 
 
 }

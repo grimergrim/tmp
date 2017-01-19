@@ -13,5 +13,11 @@ public interface HttpEndpointsApi {
     @POST(HttpApi.USER_GET)
     Call<GetUserResponse> getUserInfo(@Field("access_token") String token);
 
+    @FormUrlEncoded
+    @POST(HttpApi.USER_UPDATE)
+    Call<String> updateUser(@Field("email") String email,
+                       @Field("phone") String phone,
+                       @Field("access_token") String token);
+
 }
 

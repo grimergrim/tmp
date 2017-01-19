@@ -6,4 +6,6 @@ public interface ProfilePresenter extends Presenter<ProfileView> {
 
     void getUserInfo(String token);
 
+    void updateUserInfo(String email, String phoneNumber, String token);
+
 }

@@ -219,6 +219,7 @@
                     android:layout_height="32dp"
                     android:background="@drawable/shape_button"
                     android:minHeight="32dp"
+                    android:layout_marginTop="16dp"
                     android:text="Обновить"
                     android:textAllCaps="false"
                     android:textColor="@android:color/white"
@@ -239,28 +240,12 @@
                 tools:visibility="visible">
 
                 <Button
-                    android:id="@+id/prev_car"
-                    android:layout_width="170dp"
-                    android:layout_height="36dp"
-                    android:background="@drawable/shape_button"
-                    android:minHeight="36dp"
-                    android:padding="8dp"
-                    android:text="Преидущая машина"
-                    android:textAllCaps="false"
-                    android:textColor="@android:color/white"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"/>
-
-                <Button
                     android:id="@+id/next_car"
-                    android:layout_width="170dp"
+                    android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:background="@drawable/shape_button"
+                    android:background="@drawable/shape_circle_with_right_arrow"
                     android:minHeight="36dp"
                     android:padding="8dp"
-                    android:text="Следующая машина"
-                    android:textAllCaps="false"
-                    android:textColor="@android:color/white"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toTopOf="parent"/>
 

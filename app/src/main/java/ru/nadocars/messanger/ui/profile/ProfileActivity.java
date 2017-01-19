@@ -10,7 +10,11 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -41,24 +45,20 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     private ImageView mAvatarImageView;
     private ConstraintLayout mCarsConstraintLayout;
     private MaterialCalendarView mCalendarView;
+    private ImageView mUserAvatar;
+    private Button mUpdateButton;
+    private String mEmail;
+    private String mPhone;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
-        //Find views
-        mNameTextView = (TextView) findViewById(R.id.user_name);
-        mMoneyTextView = (TextView) findViewById(R.id.money);
-        mEmailTextView = (EditText) findViewById(R.id.email);
-        mPhoneTextView = (EditText) findViewById(R.id.phone_number);
-        mAvatarImageView = (ImageView) findViewById(R.id.profile_user_avatar);
-        mCarsConstraintLayout = (ConstraintLayout) findViewById(R.id.car_layout);
-        mCalendarView = (MaterialCalendarView) findViewById(R.id.calendar_view);
+        findViews();
+        setListeners();
         if (mCarsConstraintLayout != null)
             mCarsConstraintLayout.setVisibility(View.GONE);
-
         //TODO add exit and settings buttons action
-
         mProfilePresenter = ProfilePresenterImpl.getPreLoginPresenter();
         mProfilePresenter.setView(this);
         mNavigator = new NavigatorImpl();
@@ -67,15 +67,101 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         if (null != token) {
             mProfilePresenter.getUserInfo(token);
         }
-        ImageView userAvatar = (ImageView) findViewById(R.id.user_avatar);
-        if (null != userAvatar) {
-            userAvatar.setVisibility(View.GONE);
+        if (null != mUserAvatar) {
+            mUserAvatar.setVisibility(View.GONE);
         }
-
-        mViewPager = (ViewPager) findViewById(R.id.car_photo_view_pager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager(), 3);
         mViewPager.setAdapter(mPagerAdapter);
         initCalendar();
+        if (null != mEmailTextView) {
+//            mEmailTextView.clearFocus();
+            mEmailTextView.setFocusable(false);
+
+        }
+        if (null != mPhoneTextView) {
+//            mPhoneTextView.clearFocus();\
+            mPhoneTextView.setFocusable(false);
+        }
+    }
+
+    private void findViews() {
+        mNameTextView = (TextView) findViewById(R.id.user_name);
+        mMoneyTextView = (TextView) findViewById(R.id.money);
+        mEmailTextView = (EditText) findViewById(R.id.email);
+        mPhoneTextView = (EditText) findViewById(R.id.phone_number);
+        mAvatarImageView = (ImageView) findViewById(R.id.profile_user_avatar);
+        mCarsConstraintLayout = (ConstraintLayout) findViewById(R.id.car_layout);
+        mCalendarView = (MaterialCalendarView) findViewById(R.id.calendar_view);
+        mUserAvatar = (ImageView) findViewById(R.id.user_avatar);
+        mViewPager = (ViewPager) findViewById(R.id.car_photo_view_pager);
+        mUpdateButton = (Button) findViewById(R.id.cancel_button);
+    }
+
+    private void setListeners() {
+        mEmailTextView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                mEmailTextView.setFocusableInTouchMode(true);
+                return false;
+            }
+        });
+        mEmailTextView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (!mEmail.equals(s)) {
+                    mUpdateButton.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        mPhoneTextView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                mPhoneTextView.setFocusableInTouchMode(true);
+                return false;
+            }
+        });
+        mPhoneTextView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (!mPhone.equals(s)) {
+                    mUpdateButton.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        mUpdateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String token = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+                        .getString(SharedPreferencesApi.TOKEN, null);
+                if (null != token && token.length() > 0) {
+                    mProfilePresenter.updateUserInfo(mEmailTextView.getText().toString(),
+                            mPhoneTextView.getText().toString(), token);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Login first please", Toast.LENGTH_SHORT)
+                            .show();
+                }
+            }
+        });
     }
 
     private void initCalendar() {
@@ -114,6 +200,8 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     @Override
     public void setProfileInfo(GetUserResponse profileInfo) {
         if (null != profileInfo) {
+            mEmail = profileInfo.getResponse().getEmail();
+            mPhone = profileInfo.getResponse().getPhone();
             mMoneyTextView.setText(String.valueOf(profileInfo.getResponse().getBalance()) + " р.");
             mNameTextView.setText(profileInfo.getResponse().getLastName() + " " + profileInfo.getResponse().getFirstName() + " " + profileInfo.getResponse().getMiddleName());
             mEmailTextView.setText(profileInfo.getResponse().getEmail());
@@ -123,6 +211,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
             } else {
                 mCarsConstraintLayout.setVisibility(View.GONE);
             }
+            mUpdateButton.setVisibility(View.GONE);
             Picasso.with(getApplicationContext()).load(profileInfo.getResponse().getAvatar()).into(mAvatarImageView);
         }
 
