@@ -1,8 +1,16 @@
 package ru.nadocars.messanger.ui.profile;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -28,6 +36,8 @@ import com.prolificinteractive.materialcalendarview.DayViewFacade;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
+
 import ru.nadocars.messanger.R;
 import ru.nadocars.messanger.api.SharedPreferencesApi;
 import ru.nadocars.messanger.asynctasks.LogOutTask;
@@ -40,6 +50,9 @@ import ru.nadocars.messanger.ui.navigation.NavigatorImpl;
 import static ru.nadocars.messanger.R.id.code;
 
 public class ProfileActivity extends AppCompatActivity implements ProfileView {
+
+    protected static final int CAMERA_REQUEST = 0;
+    protected static final int GALLERY_PICTURE = 1;
 
     ProfilePresenter mProfilePresenter;
     Navigator mNavigator;
@@ -62,6 +75,10 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     private String mToken;
     private String mSessionId;
     private long mCode;
+
+    private Bitmap bitmap;
+    private String selectedImagePath;
+    private String mImagePath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -236,6 +253,90 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
                 }
             }
         });
+        mAvatarImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startDialog();
+            }
+        });
+    }
+
+    private void startDialog() {
+        GetPictureDialogFragment getPictureDialogFragment = new GetPictureDialogFragment();
+        getPictureDialogFragment.show(getSupportFragmentManager(), "Input email fragment");
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        bitmap = null;
+        selectedImagePath = null;
+        if (resultCode == RESULT_OK && requestCode == CAMERA_REQUEST) {
+            File f = new File(Environment.getExternalStorageDirectory().toString());
+            for (File temp : f.listFiles()) {
+                if (temp.getName().equals("temp.jpg")) {
+                    f = temp;
+                    break;
+                }
+            }
+            if (!f.exists()) {
+                Toast.makeText(getBaseContext(), "Error while capturing image", Toast.LENGTH_LONG).show();
+                return;
+            }
+            try {
+                bitmap = BitmapFactory.decodeFile(f.getAbsolutePath());
+                bitmap = Bitmap.createScaledBitmap(bitmap, 400, 400, true);
+                int rotate = 0;
+                try {
+                    ExifInterface exif = new ExifInterface(f.getAbsolutePath());
+                    int orientation = exif.getAttributeInt(
+                            ExifInterface.TAG_ORIENTATION,
+                            ExifInterface.ORIENTATION_NORMAL);
+                    switch (orientation) {
+                        case ExifInterface.ORIENTATION_ROTATE_270:
+                            rotate = 270;
+                            break;
+                        case ExifInterface.ORIENTATION_ROTATE_180:
+                            rotate = 180;
+                            break;
+                        case ExifInterface.ORIENTATION_ROTATE_90:
+                            rotate = 90;
+                            break;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                Matrix matrix = new Matrix();
+                matrix.postRotate(rotate);
+                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                mAvatarImageView.setImageBitmap(bitmap);
+                sendAvatarToServer(bitmap);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        } else if (resultCode == RESULT_OK && requestCode == GALLERY_PICTURE) {
+            if (data != null) {
+                String[] filePathColumn = { MediaStore.Images.Media.DATA };
+                Cursor cursor = getContentResolver().query(data.getData(), filePathColumn, null, null, null);
+                if (cursor != null) {
+                    cursor.moveToFirst();
+                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                    selectedImagePath = cursor.getString(columnIndex);
+                    cursor.close();
+                }
+                bitmap = BitmapFactory.decodeFile(selectedImagePath);
+                bitmap = Bitmap.createScaledBitmap(bitmap, 400, 400, false);
+                mAvatarImageView.setImageBitmap(bitmap);
+                sendAvatarToServer(bitmap);
+            } else {
+                Toast.makeText(getApplicationContext(), "Cancelled", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void sendAvatarToServer(Bitmap bitmap) {
+        //TODO add send method to presenter
     }
 
     private void initCalendar() {
