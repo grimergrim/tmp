@@ -36,7 +36,6 @@ import ru.nadocars.messanger.data.repo.MessagesRepo;
 import ru.nadocars.messanger.json.user.GetUserResponse;
 import ru.nadocars.messanger.ui.navigation.Navigator;
 import ru.nadocars.messanger.ui.navigation.NavigatorImpl;
-import ru.nadocars.messanger.ui.settings.IntervalDialogFragment;
 
 import static ru.nadocars.messanger.R.id.code;
 
@@ -101,11 +100,11 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
             mCodeLinearLayout.setVisibility(View.GONE);
         }
         if (settingsButton != null) {
-            settingsButton.setVisibility(View.VISIBLE);
+            settingsButton.setVisibility(View.GONE);
             settingsButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    openSettings();
+//                    openSettings();
                 }
             });
         }
@@ -120,12 +119,12 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         }
     }
 
-    //открыть настройки
-    private void openSettings() {
-        IntervalDialogFragment intervalDialogFragment;
-        intervalDialogFragment = new IntervalDialogFragment();
-        intervalDialogFragment.show(getFragmentManager(), "SetIntervalDialog");
-    }
+//    //открыть настройки
+//    private void openSettings() {
+//        IntervalDialogFragment intervalDialogFragment;
+//        intervalDialogFragment = new IntervalDialogFragment();
+//        intervalDialogFragment.show(getFragmentManager(), "SetIntervalDialog");
+//    }
 
     //логаут
     private void logOut() {
