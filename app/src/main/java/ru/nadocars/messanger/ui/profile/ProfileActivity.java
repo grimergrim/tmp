@@ -1,5 +1,6 @@
 package ru.nadocars.messanger.ui.profile;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.constraint.ConstraintLayout;
@@ -29,9 +30,13 @@ import com.squareup.picasso.Picasso;
 
 import ru.nadocars.messanger.R;
 import ru.nadocars.messanger.api.SharedPreferencesApi;
+import ru.nadocars.messanger.asynctasks.LogOutTask;
+import ru.nadocars.messanger.data.repo.ContactsRepo;
+import ru.nadocars.messanger.data.repo.MessagesRepo;
 import ru.nadocars.messanger.json.user.GetUserResponse;
 import ru.nadocars.messanger.ui.navigation.Navigator;
 import ru.nadocars.messanger.ui.navigation.NavigatorImpl;
+import ru.nadocars.messanger.ui.settings.IntervalDialogFragment;
 
 import static ru.nadocars.messanger.R.id.code;
 
@@ -67,7 +72,8 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         setListeners();
         if (mCarsConstraintLayout != null)
             mCarsConstraintLayout.setVisibility(View.GONE);
-        //TODO add exit and settings buttons action
+        Button exitbutton = (Button) findViewById(R.id.exit_button);
+        Button settingsButton = (Button) findViewById(R.id.check_interval);
         mProfilePresenter = ProfilePresenterImpl.getPreLoginPresenter();
         mProfilePresenter.setView(this);
         mNavigator = new NavigatorImpl();
@@ -94,6 +100,50 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         if (null != mCodeLinearLayout) {
             mCodeLinearLayout.setVisibility(View.GONE);
         }
+        if (settingsButton != null) {
+            settingsButton.setVisibility(View.VISIBLE);
+            settingsButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    openSettings();
+                }
+            });
+        }
+        if (exitbutton != null) {
+            exitbutton.setVisibility(View.VISIBLE);
+            exitbutton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    logOut();
+                }
+            });
+        }
+    }
+
+    //открыть настройки
+    private void openSettings() {
+        IntervalDialogFragment intervalDialogFragment;
+        intervalDialogFragment = new IntervalDialogFragment();
+        intervalDialogFragment.show(getFragmentManager(), "SetIntervalDialog");
+    }
+
+    //логаут
+    private void logOut() {
+        SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        LogOutTask logOutTask = new LogOutTask(this, defaultSharedPreferences.getString(SharedPreferencesApi.TOKEN, null));
+        logOutTask.execute();
+        SharedPreferences.Editor editor = defaultSharedPreferences.edit();
+        editor.remove(SharedPreferencesApi.LOGIN);
+        editor.remove(SharedPreferencesApi.PASSWORD);
+        editor.remove(SharedPreferencesApi.AVATAR);
+        editor.remove(SharedPreferencesApi.TOKEN);
+        editor.apply();
+        ContactsRepo contactsRepo = new ContactsRepo();
+        contactsRepo.deleteAll();
+        MessagesRepo messagesRepo = new MessagesRepo();
+        messagesRepo.deleteAll();
+        mNavigator.navigateToLogin(this);
+        finish();
     }
 
     private void findViews() {
