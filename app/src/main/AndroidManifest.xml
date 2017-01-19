@@ -36,7 +36,9 @@
             android:enabled="true"
             android:exported="false"/>
 
-        <activity android:name=".ui.profile.ProfileActivity">
+        <activity
+            android:name=".ui.profile.ProfileActivity"
+            android:screenOrientation="portrait">
         </activity>
     </application>
 

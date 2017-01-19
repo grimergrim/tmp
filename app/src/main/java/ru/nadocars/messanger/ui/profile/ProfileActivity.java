@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,9 +29,11 @@ import com.squareup.picasso.Picasso;
 
 import ru.nadocars.messanger.R;
 import ru.nadocars.messanger.api.SharedPreferencesApi;
-import ru.nadocars.messanger.json.GetUserResponse;
+import ru.nadocars.messanger.json.user.GetUserResponse;
 import ru.nadocars.messanger.ui.navigation.Navigator;
 import ru.nadocars.messanger.ui.navigation.NavigatorImpl;
+
+import static ru.nadocars.messanger.R.id.code;
 
 public class ProfileActivity extends AppCompatActivity implements ProfileView {
 
@@ -47,8 +50,14 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     private MaterialCalendarView mCalendarView;
     private ImageView mUserAvatar;
     private Button mUpdateButton;
+    private LinearLayout mCodeLinearLayout;
+    private EditText mCodeEditText;
+    private Button mSaveButton;
     private String mEmail;
     private String mPhone;
+    private String mToken;
+    private String mSessionId;
+    private long mCode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +91,9 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
 //            mPhoneTextView.clearFocus();\
             mPhoneTextView.setFocusable(false);
         }
+        if (null != mCodeLinearLayout) {
+            mCodeLinearLayout.setVisibility(View.GONE);
+        }
     }
 
     private void findViews() {
@@ -95,6 +107,9 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         mUserAvatar = (ImageView) findViewById(R.id.user_avatar);
         mViewPager = (ViewPager) findViewById(R.id.car_photo_view_pager);
         mUpdateButton = (Button) findViewById(R.id.cancel_button);
+        mCodeLinearLayout = (LinearLayout) findViewById(R.id.code_layout);
+        mCodeEditText = (EditText) findViewById(code);
+        mSaveButton = (Button) findViewById(R.id.save_button);
     }
 
     private void setListeners() {
@@ -118,7 +133,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (!mEmail.equals(s)) {
+                if (null != mEmail && !mEmail.equals(s)) {
                     mUpdateButton.setVisibility(View.VISIBLE);
                 }
             }
@@ -159,6 +174,16 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
                 } else {
                     Toast.makeText(getApplicationContext(), "Login first please", Toast.LENGTH_SHORT)
                             .show();
+                }
+            }
+        });
+        mSaveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (null != mCodeEditText.getText() && mCodeEditText.getText().toString().equals(String.valueOf(mCode))) {
+                    mProfilePresenter.updateUserInfo(mEmail, mPhone, mToken, mSessionId, mCode);
+                } else {
+                    showError("Не верный код");
                 }
             }
         });
@@ -220,6 +245,25 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     @Override
     public void showError(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void requestVerificationCode(String email, String phoneNumber, String token, String ssesionId, long code) {
+        mUpdateButton.setVisibility(View.GONE);
+        mCodeLinearLayout.setVisibility(View.VISIBLE);
+        mToken = token;
+        mSessionId = ssesionId;
+        mCode = code;
+    }
+
+    @Override
+    public void hideUpdateButton() {
+        mUpdateButton.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void hideCodeLayout() {
+        mCodeLinearLayout.setVisibility(View.GONE);
     }
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {

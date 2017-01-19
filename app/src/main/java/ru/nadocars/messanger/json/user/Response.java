@@ -1,4 +1,4 @@
-package ru.nadocars.messanger.json;
+package ru.nadocars.messanger.json.user;
 
 import com.google.gson.annotations.SerializedName;
 

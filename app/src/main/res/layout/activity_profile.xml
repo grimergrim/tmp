@@ -245,6 +245,7 @@
                     android:layout_height="36dp"
                     android:background="@drawable/shape_circle_with_right_arrow"
                     android:minHeight="36dp"
+                    android:minWidth="36dp"
                     android:padding="8dp"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toTopOf="parent"/>

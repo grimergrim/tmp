@@ -1,11 +1,17 @@
 package ru.nadocars.messanger.ui.profile;
 
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import ru.nadocars.messanger.api.HttpEndpointsApi;
 import ru.nadocars.messanger.http.RetrofitFactory;
-import ru.nadocars.messanger.json.GetUserResponse;
+import ru.nadocars.messanger.json.user.GetUserResponse;
+import ru.nadocars.messanger.json.user.update.error102.UserUpdateError102;
+import ru.nadocars.messanger.json.user.update.error103.UserUpdateError103;
+import ru.nadocars.messanger.json.user.update.error104.UserUpdateError104;
 
 public class ProfilePresenterImpl implements ProfilePresenter {
 
@@ -46,17 +52,79 @@ public class ProfilePresenterImpl implements ProfilePresenter {
     }
 
     @Override
-    public void updateUserInfo(String email, String phoneNumber, String token) {
-        Call<String> updateUserCall = mHttpEndpointApi.updateUser(email, phoneNumber, token);
-        updateUserCall.enqueue(new Callback<String>() {
+    public void updateUserInfo(final String email, final String phoneNumber, final String token) {
+        Call<Object> updateUserCall = mHttpEndpointApi.updateUser(email, phoneNumber, token);
+        updateUserCall.enqueue(new Callback<Object>() {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
+            public void onResponse(Call<Object> call, Response<Object> response) {
                 System.out.println();
+                if (response.body().toString().contains("104")) {
+                    JsonObject jsonObject = new GsonBuilder().create()
+                            .toJsonTree(response.body()).getAsJsonObject();
+                    UserUpdateError104 userUpdateError104 = new GsonBuilder().create()
+                            .fromJson(jsonObject.toString(), UserUpdateError104.class);
+                    mProfileView.requestVerificationCode(email, phoneNumber, token,
+                            userUpdateError104.getError().getErrorDetail().getCode(),
+                            userUpdateError104.getError()
+                            .getErrorDetail().getSessionId());
+                } else if (response.body().toString().contains("103")) {
+                    JsonObject jsonObject = new GsonBuilder().create()
+                            .toJsonTree(response.body()).getAsJsonObject();
+                    UserUpdateError103 userUpdateError103 = new GsonBuilder().create()
+                            .fromJson(jsonObject.toString(), UserUpdateError103.class);
+                    mProfileView.showError(userUpdateError103.getError().getErrorMsg());
+                } else if (response.body().toString().contains("102")) {
+                    JsonObject jsonObject = new GsonBuilder().create()
+                            .toJsonTree(response.body()).getAsJsonObject();
+                    UserUpdateError102 userUpdateError102 = new GsonBuilder().create()
+                            .fromJson(jsonObject.toString(), UserUpdateError102.class);
+                    mProfileView.showError(userUpdateError102.getError().getErrorMsg());
+                } else if (response.body().toString().equals("1.0")) {
+                    mProfileView.hideUpdateButton();
+                    mProfileView.showError("Данные успешно обновлены");
+                }
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
-                System.out.println();
+            public void onFailure(Call<Object> call, Throwable t) {
+                mProfileView.showError("Ошибка сервера");
+            }
+        });
+    }
+
+    @Override
+    public void updateUserInfo(String email, String phoneNumber, String token, String sesionId, long code) {
+        Call<Object> updateUserCall = mHttpEndpointApi.updateUser(email, phoneNumber, token, sesionId, code);
+        updateUserCall.enqueue(new Callback<Object>() {
+            @Override
+            public void onResponse(Call<Object> call, Response<Object> response) {
+                if (response.body().toString().contains("104")) {
+                    JsonObject jsonObject = new GsonBuilder().create()
+                            .toJsonTree(response.body()).getAsJsonObject();
+                    UserUpdateError104 userUpdateError104 = new GsonBuilder().create()
+                            .fromJson(jsonObject.toString(), UserUpdateError104.class);
+                    mProfileView.showError(userUpdateError104.getError().getErrorMsg());
+                } else if (response.body().toString().contains("103")) {
+                    JsonObject jsonObject = new GsonBuilder().create()
+                            .toJsonTree(response.body()).getAsJsonObject();
+                    UserUpdateError103 userUpdateError103 = new GsonBuilder().create()
+                            .fromJson(jsonObject.toString(), UserUpdateError103.class);
+                    mProfileView.showError(userUpdateError103.getError().getErrorMsg());
+                } else if (response.body().toString().contains("102")) {
+                    JsonObject jsonObject = new GsonBuilder().create()
+                            .toJsonTree(response.body()).getAsJsonObject();
+                    UserUpdateError102 userUpdateError102 = new GsonBuilder().create()
+                            .fromJson(jsonObject.toString(), UserUpdateError102.class);
+                    mProfileView.showError(userUpdateError102.getError().getErrorMsg());
+                } else if (response.body().toString().equals("1.0")) {
+                    mProfileView.hideCodeLayout();
+                    mProfileView.showError("Обновление успешно");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Object> call, Throwable t) {
+                mProfileView.showError("Ошибка сервера");
             }
         });
     }
