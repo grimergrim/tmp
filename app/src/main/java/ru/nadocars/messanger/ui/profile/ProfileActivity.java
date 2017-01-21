@@ -37,6 +37,7 @@ import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import ru.nadocars.messanger.R;
@@ -344,7 +345,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
                     mAvatarImageView.setImageBitmap(bitmap);
                     sendAvatarToServer(bitmap);
                 } else if (requestCode == CAR_CAMERA_REQUEST) {
-                    addPhotoToList(bitmap);
+                    addPhotoToList(f.getAbsolutePath());
                     sendCarPhotoToServer(bitmap);
                 }
             } catch (Exception e) {
@@ -368,10 +369,9 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
                     mAvatarImageView.setImageBitmap(bitmap);
                     sendAvatarToServer(bitmap);
                 } else if (requestCode == CAR_GALLERY_REQUEST) {
-                    addPhotoToList(bitmap);
+                    addPhotoToList(selectedImagePath);
                     sendCarPhotoToServer(bitmap);
                 }
-
             } else {
                 Toast.makeText(getApplicationContext(), "Cancelled", Toast.LENGTH_SHORT).show();
             }
@@ -386,8 +386,11 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         //TODO add send method to presenter
     }
 
-    private void addPhotoToList(Bitmap bitmap) {
-        //TODO implement
+    private void addPhotoToList(String uri) {
+        List<String> photoList = ((ScreenSlidePagerAdapter) mViewPager.getAdapter()).getPhotoList();
+        photoList.add(uri);
+        ((ScreenSlidePagerAdapter) mViewPager.getAdapter()).setPhotoList(photoList);
+        mViewPager.setCurrentItem(mViewPager.getAdapter().getCount());
     }
 
     private void initCalendar() {
@@ -474,16 +477,20 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         mDayPriceEditText.setText(String.valueOf(car.getDayPrice()));
         mWeekPriceEditText.setText(String.valueOf(car.getWeekPrice()));
         mMonthPriceEditText.setText(String.valueOf(car.getMonthPrice()));
-        mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager(), car.getPhotos());
+        List<String> photoUrls = new ArrayList<>();
+        for (Photo photo : car.getPhotos()) {
+            photoUrls.add(photo.getImage600x360());
+        }
+        mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager(), photoUrls);
         mViewPager.setAdapter(mPagerAdapter);
 
     }
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
 
-        private List<Photo> mPhotoList;
+        private List<String> mPhotoList;
 
-        public ScreenSlidePagerAdapter(FragmentManager fragmentManager, List<Photo> photos) {
+        public ScreenSlidePagerAdapter(FragmentManager fragmentManager, List<String> photos) {
             super(fragmentManager);
             mPhotoList = photos;
         }
@@ -491,7 +498,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         @Override
         public Fragment getItem(int position) {
             Bundle bundle = new Bundle();
-            bundle.putString("url", mPhotoList.get(position).getImage600x360());
+            bundle.putString("url", mPhotoList.get(position));
             ScreenSlidePageFragment screenSlidePageFragment = new ScreenSlidePageFragment();
             screenSlidePageFragment.setArguments(bundle);
             return screenSlidePageFragment;
@@ -500,6 +507,15 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         @Override
         public int getCount() {
             return mPhotoList.size();
+        }
+
+        public List<String> getPhotoList() {
+            return mPhotoList;
+        }
+
+        public void setPhotoList(List<String> photoList) {
+            mPhotoList = photoList;
+            notifyDataSetChanged();
         }
     }
 

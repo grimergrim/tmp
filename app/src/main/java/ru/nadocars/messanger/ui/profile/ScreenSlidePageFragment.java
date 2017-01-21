@@ -1,5 +1,6 @@
 package ru.nadocars.messanger.ui.profile;
 
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -19,7 +20,11 @@ public class ScreenSlidePageFragment extends Fragment {
         String photoUrl = arguments.getString("url");
         View view= inflater.inflate(R.layout.fragment_screen_slide_page, container, false);
         ImageView carPhotoImageView = (ImageView) view.findViewById(R.id.carPhotoImageView);
-        Picasso.with(getContext()).load(photoUrl).resize(0, 1500).into(carPhotoImageView);
+        if (null != photoUrl && photoUrl.length() > 0 && photoUrl.toLowerCase().startsWith("http")) {
+            Picasso.with(getContext()).load(photoUrl).resize(0, 1500).into(carPhotoImageView);
+        } else if (null != photoUrl && photoUrl.length() > 0) {
+            carPhotoImageView.setImageBitmap(BitmapFactory.decodeFile(photoUrl));
+        }
         return view;
     }
 
