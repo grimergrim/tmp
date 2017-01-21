@@ -1,5 +1,6 @@
 package ru.nadocars.messanger.ui.profile;
 
+import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -24,6 +25,7 @@ import android.text.TextWatcher;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -43,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import ru.nadocars.messanger.R;
 import ru.nadocars.messanger.api.SharedPreferencesApi;
@@ -92,6 +95,10 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     private Button mAddPhotoButton;
     private Button mDeletePhotoButton;
     private Button mNextCarButton;
+    private LinearLayout mToDateLinearLayout;
+    private TextView mToDateTextView;
+    private LinearLayout mFromDateLinearLayout;
+    private TextView mFromDateTextView;
 
     private long mCode;
 
@@ -101,11 +108,15 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     private String mToken;
     private int mCarCounter;
     private GetCarsResponse mGetCarsResponse;
+    private Calendar mToDateCalendar;
+    private Calendar mFromDateCalendar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mCarCounter = 0;
+        mToDateCalendar = Calendar.getInstance();
+        mFromDateCalendar = Calendar.getInstance();
         setContentView(R.layout.activity_profile);
         findViews();
         setListeners();
@@ -205,6 +216,10 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         mAddPhotoButton = (Button) findViewById(R.id.add_photo);
         mDeletePhotoButton = (Button) findViewById(R.id.remove_photo);
         mNextCarButton = (Button) findViewById(R.id.next_car);
+        mToDateLinearLayout = (LinearLayout) findViewById(R.id.to_date);
+        mToDateTextView = (TextView) findViewById(R.id.to_date_text_view);
+        mFromDateLinearLayout = (LinearLayout) findViewById(R.id.from_date);
+        mFromDateTextView = (TextView) findViewById(R.id.from_date_text_view);
     }
 
     private void setListeners() {
@@ -307,6 +322,56 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
                 setCarInfo();
             }
         });
+        mToDateLinearLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new DatePickerDialog(ProfileActivity.this, toDateSetListener, mToDateCalendar
+                        .get(Calendar.YEAR), mToDateCalendar.get(Calendar.MONTH),
+                        mToDateCalendar.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
+        mFromDateLinearLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new DatePickerDialog(ProfileActivity.this, fromDateSetListener, mFromDateCalendar
+                        .get(Calendar.YEAR), mFromDateCalendar.get(Calendar.MONTH),
+                        mFromDateCalendar.get(Calendar.DAY_OF_MONTH)).show();
+            }
+        });
+    }
+
+    private DatePickerDialog.OnDateSetListener toDateSetListener = new DatePickerDialog.OnDateSetListener() {
+        @Override
+        public void onDateSet(DatePicker view, int year, int monthOfYear,
+                              int dayOfMonth) {
+            mToDateCalendar.set(Calendar.YEAR, year);
+            mToDateCalendar.set(Calendar.MONTH, monthOfYear);
+            mToDateCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            setToDateTextView();
+        }
+    };
+
+    private DatePickerDialog.OnDateSetListener fromDateSetListener = new DatePickerDialog.OnDateSetListener() {
+        @Override
+        public void onDateSet(DatePicker view, int year, int monthOfYear,
+                              int dayOfMonth) {
+            mFromDateCalendar.set(Calendar.YEAR, year);
+            mFromDateCalendar.set(Calendar.MONTH, monthOfYear);
+            mFromDateCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+            fromToDateTextView();
+        }
+    };
+
+    private void setToDateTextView() {
+        String myFormat = "dd/MM/yyyy"; //In which you need put here
+        SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
+        mToDateTextView.setText(sdf.format(mToDateCalendar.getTime()));
+    }
+
+    private void fromToDateTextView() {
+        String myFormat = "dd/MM/yyyy"; //In which you need put here
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(myFormat, Locale.US);
+        mFromDateTextView.setText(simpleDateFormat.format(mFromDateCalendar.getTime()));
     }
 
     private void startDialog(int cameraRequestCode, int galleryRequestCode) {

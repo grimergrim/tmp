@@ -258,7 +258,7 @@
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/next_car"
-                    tools:layout_height="10dp"/>
+                    />
 
                 <Button
                     android:id="@+id/remove_photo"
@@ -552,6 +552,11 @@
                     <TextView
                         android:id="@+id/from_date_text_view"
                         android:layout_width="110dp"
+                        android:layout_gravity="center"
+                        android:textSize="14sp"
+                        android:gravity="center"
+                        android:textColor="@android:color/black"
+                        tools:text="12/12/1212"
                         android:layout_height="24dp"/>
 
                     <ImageView
@@ -595,6 +600,11 @@
                     <TextView
                         android:id="@+id/to_date_text_view"
                         android:layout_width="110dp"
+                        android:layout_gravity="center"
+                        android:textSize="14sp"
+                        android:gravity="center"
+                        android:textColor="@android:color/black"
+                        tools:text="12/12/1212"
                         android:layout_height="24dp"/>
 
                     <ImageView
