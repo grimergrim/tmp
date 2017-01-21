@@ -10,6 +10,7 @@ import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
 import ru.nadocars.messanger.json.car.GetCarsResponse;
+import ru.nadocars.messanger.json.car.calendar.GetCarCalendarResponse;
 import ru.nadocars.messanger.json.user.GetUserResponse;
 
 public interface HttpEndpointsApi {
@@ -17,6 +18,10 @@ public interface HttpEndpointsApi {
     @FormUrlEncoded
     @POST(HttpApi.USER_GET)
     Call<GetUserResponse> getUserInfo(@Field("access_token") String token);
+
+    @FormUrlEncoded
+    @POST(HttpApi.GET_CARS_CALENDAR)
+    Call<GetCarCalendarResponse> getCarCalendar(@Field("car_id") String carId);
 
     @FormUrlEncoded
     @POST(HttpApi.USER_UPDATE)
@@ -37,6 +42,12 @@ public interface HttpEndpointsApi {
     Call<GetCarsResponse> getCars(@Field("access_token") String token,
                                   @Field("offset") int offset,
                                   @Field("count") int count);
+
+    @FormUrlEncoded
+    @POST(HttpApi.DELETE_CAR_PHOTO)
+    Call<ResponseBody> deleteCarPhoto(@Field("access_token") String token,
+                                      @Field("car_id") String carId,
+                                      @Field("photo_id") String photoId);
 
     @Multipart
     @POST(HttpApi.UPLOAD_USER_AVATAR)

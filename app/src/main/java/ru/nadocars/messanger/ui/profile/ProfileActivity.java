@@ -37,7 +37,11 @@ import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import ru.nadocars.messanger.R;
@@ -48,6 +52,7 @@ import ru.nadocars.messanger.data.repo.MessagesRepo;
 import ru.nadocars.messanger.json.car.GetCarsResponse;
 import ru.nadocars.messanger.json.car.Item;
 import ru.nadocars.messanger.json.car.Photo;
+import ru.nadocars.messanger.json.car.calendar.GetCarCalendarResponse;
 import ru.nadocars.messanger.json.user.GetUserResponse;
 import ru.nadocars.messanger.ui.navigation.Navigator;
 import ru.nadocars.messanger.ui.navigation.NavigatorImpl;
@@ -86,6 +91,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     private EditText mMonthPriceEditText;
     private Button mAddPhotoButton;
     private Button mDeletePhotoButton;
+    private Button mNextCarButton;
 
     private long mCode;
 
@@ -93,10 +99,13 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     private String selectedImagePath;
     private String mImagePath;
     private String mToken;
+    private int mCarCounter;
+    private GetCarsResponse mGetCarsResponse;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mCarCounter = 0;
         setContentView(R.layout.activity_profile);
         findViews();
         setListeners();
@@ -116,7 +125,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         if (null != mUserAvatar) {
             mUserAvatar.setVisibility(View.GONE);
         }
-        initCalendar();
+//        initCalendar();
         if (null != mEmailTextView) {
 //            mEmailTextView.clearFocus();
             mEmailTextView.setFocusable(false);
@@ -195,6 +204,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         mMonthPriceEditText = (EditText) findViewById(R.id.month_price);
         mAddPhotoButton = (Button) findViewById(R.id.add_photo);
         mDeletePhotoButton = (Button) findViewById(R.id.remove_photo);
+        mNextCarButton = (Button) findViewById(R.id.next_car);
     }
 
     private void setListeners() {
@@ -282,6 +292,19 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
             @Override
             public void onClick(View v) {
                 startDialog(CAR_CAMERA_REQUEST, CAR_GALLERY_REQUEST);
+            }
+        });
+        mDeletePhotoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO add car id and photo id to delete
+                mProfilePresenter.deleteCarPhoto(mToken, "", "");
+            }
+        });
+        mNextCarButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setCarInfo();
             }
         });
     }
@@ -393,23 +416,23 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         mViewPager.setCurrentItem(mViewPager.getAdapter().getCount());
     }
 
-    private void initCalendar() {
-        if (null != mCalendarView) {
-            mCalendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_NONE);
-            mCalendarView.addDecorator(new DayViewDecorator() {
-                @Override
-                public boolean shouldDecorate(CalendarDay day) {
-                    return true;
-                }
-
-                @Override
-                public void decorate(DayViewFacade view) {
-                    view.setBackgroundDrawable(ContextCompat.getDrawable(getApplicationContext(),
-                            R.drawable.shape_calendar_view));
-                }
-            });
-        }
-    }
+//    private void initCalendar() {
+//        if (null != mCalendarView) {
+//            mCalendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_NONE);
+//            mCalendarView.addDecorator(new DayViewDecorator() {
+//                @Override
+//                public boolean shouldDecorate(CalendarDay day) {
+//                    return true;
+//                }
+//
+//                @Override
+//                public void decorate(DayViewFacade view) {
+//                    view.setBackgroundDrawable(ContextCompat.getDrawable(getApplicationContext(),
+//                            R.drawable.shape_calendar_busy_day));
+//                }
+//            });
+//        }
+//    }
 
     @Override
     protected void onPause() {
@@ -471,7 +494,112 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
 
     @Override
     public void setCarsInfo(GetCarsResponse carsInfo) {
-        Item car = carsInfo.getResponse().getItems().get(0);
+        mGetCarsResponse = carsInfo;
+        setCarInfo();
+    }
+
+    @Override
+    public void setBusyDays(final GetCarCalendarResponse getCarCalendarResponse) {
+        if (null != mCalendarView) {
+            mCalendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_NONE);
+            ArrayList<DayViewDecorator> dayViewDecorators = new ArrayList<>();
+            dayViewDecorators.add(new DayViewDecorator() {
+                @Override
+                public boolean shouldDecorate(CalendarDay day) {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss",
+                            getResources().getConfiguration().locale);
+                    String fromDateAsString;
+                    String toDateAsString;
+                    Date fromDate;
+                    Date toDate;
+                    Calendar calendarFrom = Calendar.getInstance();
+                    Calendar calendarTo = Calendar.getInstance();
+                    for (ru.nadocars.messanger.json.car.calendar.Item item : getCarCalendarResponse.getResponse().getItems()) {
+                        fromDateAsString = item.getBusyFrom();
+                        toDateAsString = item.getBusyTo();
+                        try {
+                            fromDate = dateFormat.parse(fromDateAsString);
+                            toDate = dateFormat.parse(toDateAsString);
+                            calendarFrom.setTime(fromDate);
+                            calendarTo.setTime(toDate);
+                            int busyYearFrom = calendarFrom.get(Calendar.YEAR);
+                            int busyMonthFrom = calendarFrom.get(Calendar.MONTH);
+                            int busyDayFrom = calendarFrom.get(Calendar.DAY_OF_MONTH);
+                            int busyYearTo = calendarTo.get(Calendar.YEAR);
+                            int busyMonthTo = calendarTo.get(Calendar.MONTH);
+                            int busyDayTo = calendarTo.get(Calendar.DAY_OF_MONTH);
+                            int calendarYear = day.getYear();
+                            int calendarMonth = day.getMonth();
+                            int calendarDay = day.getDay();
+                            if (calendarYear >= busyYearFrom && calendarYear <= busyYearTo &&
+                                    calendarMonth >= busyMonthFrom && calendarMonth <= busyMonthTo &&
+                                    calendarDay >= busyDayFrom && calendarDay <= busyDayTo) {
+                                return true;
+                            }
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    return false;
+                }
+                @Override
+                public void decorate(DayViewFacade view) {
+                    view.setBackgroundDrawable(ContextCompat.getDrawable(getApplicationContext(),
+                            R.drawable.shape_calendar_busy_day));
+                }
+            });
+            dayViewDecorators.add(new DayViewDecorator() {
+                @Override
+                public boolean shouldDecorate(CalendarDay day) {
+                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss",
+                            getResources().getConfiguration().locale);
+                    String fromDateAsString;
+                    String toDateAsString;
+                    Date fromDate;
+                    Date toDate;
+                    Calendar calendarFrom = Calendar.getInstance();
+                    Calendar calendarTo = Calendar.getInstance();
+                    for (ru.nadocars.messanger.json.car.calendar.Item item : getCarCalendarResponse.getResponse().getItems()) {
+                        fromDateAsString = item.getBusyFrom();
+                        toDateAsString = item.getBusyTo();
+                        try {
+                            fromDate = dateFormat.parse(fromDateAsString);
+                            toDate = dateFormat.parse(toDateAsString);
+                            calendarFrom.setTime(fromDate);
+                            calendarTo.setTime(toDate);
+                            int busyYearFrom = calendarFrom.get(Calendar.YEAR);
+                            int busyMonthFrom = calendarFrom.get(Calendar.MONTH);
+                            int busyDayFrom = calendarFrom.get(Calendar.DAY_OF_MONTH);
+                            int busyYearTo = calendarTo.get(Calendar.YEAR);
+                            int busyMonthTo = calendarTo.get(Calendar.MONTH);
+                            int busyDayTo = calendarTo.get(Calendar.DAY_OF_MONTH);
+                            int calendarYear = day.getYear();
+                            int calendarMonth = day.getMonth();
+                            int calendarDay = day.getDay();
+                            if (calendarYear >= busyYearFrom && calendarYear <= busyYearTo &&
+                                    calendarMonth >= busyMonthFrom && calendarMonth <= busyMonthTo &&
+                                    calendarDay >= busyDayFrom && calendarDay <= busyDayTo) {
+                                return false;
+                            }
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    return true;
+                }
+                @Override
+                public void decorate(DayViewFacade view) {
+                    view.setBackgroundDrawable(ContextCompat.getDrawable(getApplicationContext(),
+                                R.drawable.shape_calendar_free_day));
+                }
+            });
+            mCalendarView.addDecorators(dayViewDecorators);
+        }
+    }
+
+    private void setCarInfo() {
+        Item car = mGetCarsResponse.getResponse().getItems().get(mCarCounter);
+        mProfilePresenter.getCarCalendar(car.getId());
         String carName = car.getMark() + " " + car.getModel() + " " + car.getYear();
         mCarTitleEditText.setText(carName);
         mDayPriceEditText.setText(String.valueOf(car.getDayPrice()));
@@ -483,7 +611,11 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         }
         mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager(), photoUrls);
         mViewPager.setAdapter(mPagerAdapter);
-
+        if (mCarCounter < mGetCarsResponse.getResponse().getItems().size() - 1) {
+            mCarCounter++;
+        } else {
+            mCarCounter = 0;
+        }
     }
 
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {

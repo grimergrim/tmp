@@ -23,6 +23,7 @@ public interface HttpApi {
     String CARS_GET = "cars.get/";
     String UPLOAD_USER_AVATAR = "user.avatar/";
     String UPLOAD_CAR_PHOTO = "cars.uploadphoto/";
-
+    String DELETE_CAR_PHOTO = "cars.deletephoto/";
+    String GET_CARS_CALENDAR = "cars.calendar/";
 
 }

@@ -14,6 +14,7 @@ import retrofit2.Response;
 import ru.nadocars.messanger.api.HttpEndpointsApi;
 import ru.nadocars.messanger.http.RetrofitFactory;
 import ru.nadocars.messanger.json.car.GetCarsResponse;
+import ru.nadocars.messanger.json.car.calendar.GetCarCalendarResponse;
 import ru.nadocars.messanger.json.user.GetUserResponse;
 import ru.nadocars.messanger.json.user.update.error102.UserUpdateError102;
 import ru.nadocars.messanger.json.user.update.error103.UserUpdateError103;
@@ -163,11 +164,13 @@ public class ProfilePresenterImpl implements ProfilePresenter {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 System.out.println();
+                //TODO add implementation
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 System.out.println();
+                //TODO add implementation
             }
         });
     }
@@ -182,11 +185,51 @@ public class ProfilePresenterImpl implements ProfilePresenter {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 System.out.println();
+                //TODO add implementation
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
                 System.out.println();
+                //TODO add implementation
+            }
+        });
+    }
+
+    @Override
+    public void deleteCarPhoto(String token, String carId, String photoId) {
+        Call<ResponseBody> deleteCarPhotoCall = mHttpEndpointApi.deleteCarPhoto(token, carId, photoId);
+        deleteCarPhotoCall.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                System.out.println();
+                //TODO add implementation
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                System.out.println();
+                //TODO add implementation
+            }
+        });
+    }
+
+    @Override
+    public void getCarCalendar(String carId) {
+        Call<GetCarCalendarResponse> carCalendarCall = mHttpEndpointApi.getCarCalendar(carId);
+        carCalendarCall.enqueue(new Callback<GetCarCalendarResponse>() {
+            @Override
+            public void onResponse(Call<GetCarCalendarResponse> call, Response<GetCarCalendarResponse> response) {
+                if (response.isSuccessful()) {
+                    mProfileView.setBusyDays(response.body());
+                } else {
+                    mProfileView.showError("Ошибка сервера");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GetCarCalendarResponse> call, Throwable t) {
+                mProfileView.showError("Ошибка сервера");
             }
         });
     }
