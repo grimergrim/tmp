@@ -5,6 +5,7 @@ import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.POST;
+import ru.nadocars.messanger.json.car.GetCarsResponse;
 import ru.nadocars.messanger.json.user.GetUserResponse;
 
 public interface HttpEndpointsApi {
@@ -26,6 +27,12 @@ public interface HttpEndpointsApi {
                             @Field("access_token") String token,
                             @Field("session_id") String sessionId,
                             @Field("code") long code);
+
+    @FormUrlEncoded
+    @POST(HttpApi.USER_UPDATE)
+    Call<GetCarsResponse> getCars(@Field("access_token") String token,
+                                  @Field("offset") String offset,
+                                  @Field("count") int count);
 
 }
 

@@ -8,6 +8,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import ru.nadocars.messanger.api.HttpEndpointsApi;
 import ru.nadocars.messanger.http.RetrofitFactory;
+import ru.nadocars.messanger.json.car.GetCarsResponse;
 import ru.nadocars.messanger.json.user.GetUserResponse;
 import ru.nadocars.messanger.json.user.update.error102.UserUpdateError102;
 import ru.nadocars.messanger.json.user.update.error103.UserUpdateError103;
@@ -125,6 +126,22 @@ public class ProfilePresenterImpl implements ProfilePresenter {
             @Override
             public void onFailure(Call<Object> call, Throwable t) {
                 mProfileView.showError("Ошибка сервера");
+            }
+        });
+    }
+
+    @Override
+    public void getCars(String token) {
+        Call<GetCarsResponse> getCarsCall = mHttpEndpointApi.getCars(token, "", 100);
+        getCarsCall.enqueue(new Callback<GetCarsResponse>() {
+            @Override
+            public void onResponse(Call<GetCarsResponse> call, Response<GetCarsResponse> response) {
+                System.out.println();
+            }
+
+            @Override
+            public void onFailure(Call<GetCarsResponse> call, Throwable t) {
+                System.out.println();
             }
         });
     }
