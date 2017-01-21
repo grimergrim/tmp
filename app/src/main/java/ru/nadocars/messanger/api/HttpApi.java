@@ -21,6 +21,8 @@ public interface HttpApi {
     String DIALOG_READED = "dialog.readed/";
     String USER_UPDATE = "user.update/";
     String CARS_GET = "cars.get/";
+    String UPLOAD_USER_AVATAR = "user.avatar/";
+    String UPLOAD_CAR_PHOTO = "cars.uploadphoto/";
 
 
 }

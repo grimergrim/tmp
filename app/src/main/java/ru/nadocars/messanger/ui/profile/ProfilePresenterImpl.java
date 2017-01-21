@@ -3,6 +3,11 @@ package ru.nadocars.messanger.ui.profile;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
+import java.io.File;
+
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -67,7 +72,7 @@ public class ProfilePresenterImpl implements ProfilePresenter {
                     mProfileView.requestVerificationCode(email, phoneNumber, token,
                             userUpdateError104.getError().getErrorDetail().getCode(),
                             userUpdateError104.getError()
-                            .getErrorDetail().getSessionId());
+                                    .getErrorDetail().getSessionId());
                 } else if (response.body().toString().contains("103")) {
                     JsonObject jsonObject = new GsonBuilder().create()
                             .toJsonTree(response.body()).getAsJsonObject();
@@ -144,6 +149,44 @@ public class ProfilePresenterImpl implements ProfilePresenter {
             @Override
             public void onFailure(Call<GetCarsResponse> call, Throwable t) {
                 mProfileView.showError("Ошибка соединения с сервером");
+            }
+        });
+    }
+
+    @Override
+    public void uploadAvatar(String token, String uri) {
+        File file = new File(uri);
+        RequestBody fileBody = RequestBody.create(MediaType.parse("image/jpeg"), file);
+        RequestBody tokenBody = RequestBody.create(MediaType.parse("text/plain"), token);
+        Call<ResponseBody> call = mHttpEndpointApi.uploadUserAvatar(tokenBody, fileBody);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                System.out.println();
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                System.out.println();
+            }
+        });
+    }
+
+    @Override
+    public void uploadCarPhoto(String token, String uri) {
+        File file = new File(uri);
+        RequestBody fileBody = RequestBody.create(MediaType.parse("image/jpeg"), file);
+        RequestBody tokenBody = RequestBody.create(MediaType.parse("text/plain"), token);
+        Call<ResponseBody> call = mHttpEndpointApi.uploadCarPhoto(tokenBody, fileBody);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                System.out.println();
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                System.out.println();
             }
         });
     }

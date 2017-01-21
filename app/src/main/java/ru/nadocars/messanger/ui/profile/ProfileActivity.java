@@ -79,7 +79,6 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     private Button mSaveButton;
     private String mEmail;
     private String mPhone;
-    private String mToken;
     private String mSessionId;
     private TextView mCarTitleEditText;
     private EditText mDayPriceEditText;
@@ -93,6 +92,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     private Bitmap bitmap;
     private String selectedImagePath;
     private String mImagePath;
+    private String mToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,11 +107,11 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         mProfilePresenter = ProfilePresenterImpl.getPreLoginPresenter();
         mProfilePresenter.setView(this);
         mNavigator = new NavigatorImpl();
-        String token = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+        mToken = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
                 .getString(SharedPreferencesApi.TOKEN, null);
-        if (null != token) {
-            mProfilePresenter.getUserInfo(token);
-            mProfilePresenter.getCars(token);
+        if (null != mToken) {
+            mProfilePresenter.getUserInfo(mToken);
+            mProfilePresenter.getCars(mToken);
         }
         if (null != mUserAvatar) {
             mUserAvatar.setVisibility(View.GONE);
@@ -302,25 +302,25 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         selectedImagePath = null;
         if (resultCode == RESULT_OK && requestCode == AVATAR_CAMERA_REQUEST
                 || resultCode == RESULT_OK && requestCode == CAR_CAMERA_REQUEST) {
-            File f = new File(Environment.getExternalStorageDirectory().toString());
-            for (File temp : f.listFiles()) {
+            File file = new File(Environment.getExternalStorageDirectory().toString());
+            for (File temp : file.listFiles()) {
                 if (temp.getName().equals("temp.jpg")) {
-                    f = temp;
+                    file = temp;
                     break;
                 }
             }
-            if (!f.exists()) {
+            if (!file.exists()) {
                 Toast.makeText(getBaseContext(), "Error while capturing image", Toast.LENGTH_LONG).show();
                 return;
             }
             try {
-                bitmap = BitmapFactory.decodeFile(f.getAbsolutePath());
+                bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
                 if (requestCode == AVATAR_CAMERA_REQUEST) {
                     bitmap = Bitmap.createScaledBitmap(bitmap, 400, 400, true);
                 }
                 int rotate = 0;
                 try {
-                    ExifInterface exif = new ExifInterface(f.getAbsolutePath());
+                    ExifInterface exif = new ExifInterface(file.getAbsolutePath());
                     int orientation = exif.getAttributeInt(
                             ExifInterface.TAG_ORIENTATION,
                             ExifInterface.ORIENTATION_NORMAL);
@@ -343,10 +343,10 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
                 bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
                 if (requestCode == AVATAR_CAMERA_REQUEST) {
                     mAvatarImageView.setImageBitmap(bitmap);
-                    sendAvatarToServer(bitmap);
+                    sendAvatarToServer(file.getAbsolutePath());
                 } else if (requestCode == CAR_CAMERA_REQUEST) {
-                    addPhotoToList(f.getAbsolutePath());
-                    sendCarPhotoToServer(bitmap);
+                    addPhotoToList(file.getAbsolutePath());
+                    sendCarPhotoToServer(file.getAbsolutePath());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -367,10 +367,10 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
                 if (requestCode == AVATAR_GALLERY_REQUEST) {
                     bitmap = Bitmap.createScaledBitmap(bitmap, 400, 400, false);
                     mAvatarImageView.setImageBitmap(bitmap);
-                    sendAvatarToServer(bitmap);
+                    sendAvatarToServer(selectedImagePath);
                 } else if (requestCode == CAR_GALLERY_REQUEST) {
                     addPhotoToList(selectedImagePath);
-                    sendCarPhotoToServer(bitmap);
+                    sendCarPhotoToServer(selectedImagePath);
                 }
             } else {
                 Toast.makeText(getApplicationContext(), "Cancelled", Toast.LENGTH_SHORT).show();
@@ -378,12 +378,12 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         }
     }
 
-    private void sendAvatarToServer(Bitmap bitmap) {
-        //TODO add send method to presenter
+    private void sendAvatarToServer(String uri) {
+        mProfilePresenter.uploadAvatar(mToken, uri);
     }
 
-    private void sendCarPhotoToServer(Bitmap bitmap) {
-        //TODO add send method to presenter
+    private void sendCarPhotoToServer(String uri) {
+        mProfilePresenter.uploadCarPhoto(mToken, uri);
     }
 
     private void addPhotoToList(String uri) {
