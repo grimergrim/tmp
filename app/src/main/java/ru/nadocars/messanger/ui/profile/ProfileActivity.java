@@ -24,11 +24,13 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -69,8 +71,8 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     protected static final int CAR_CAMERA_REQUEST = 2;
     protected static final int CAR_GALLERY_REQUEST = 3;
 
-    ProfilePresenter mProfilePresenter;
-    Navigator mNavigator;
+    private ProfilePresenter mProfilePresenter;
+    private Navigator mNavigator;
     private ViewPager mViewPager;
     private PagerAdapter mPagerAdapter;
     private TextView mNameTextView;
@@ -99,17 +101,19 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     private TextView mToDateTextView;
     private LinearLayout mFromDateLinearLayout;
     private TextView mFromDateTextView;
-
-    private long mCode;
+    private Spinner mFromSpinner;
+    private Spinner mToSpinner;
+    private Button mMarkDaysButton;
 
     private Bitmap bitmap;
     private String selectedImagePath;
     private String mImagePath;
     private String mToken;
-    private int mCarCounter;
     private GetCarsResponse mGetCarsResponse;
     private Calendar mToDateCalendar;
     private Calendar mFromDateCalendar;
+    private long mCode;
+    private int mCarCounter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,6 +124,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         setContentView(R.layout.activity_profile);
         findViews();
         setListeners();
+        initializeSpinners();
         if (mCarsConstraintLayout != null)
             mCarsConstraintLayout.setVisibility(View.GONE);
         Button exitbutton = (Button) findViewById(R.id.exit_button);
@@ -220,6 +225,9 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         mToDateTextView = (TextView) findViewById(R.id.to_date_text_view);
         mFromDateLinearLayout = (LinearLayout) findViewById(R.id.from_date);
         mFromDateTextView = (TextView) findViewById(R.id.from_date_text_view);
+        mFromSpinner = (Spinner) findViewById(R.id.from_spinner);
+        mToSpinner = (Spinner) findViewById(R.id.to_spinner);
+        mMarkDaysButton = (Button) findViewById(R.id.mark_days_button);
     }
 
     private void setListeners() {
@@ -338,6 +346,17 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
                         mFromDateCalendar.get(Calendar.DAY_OF_MONTH)).show();
             }
         });
+    }
+
+    private void initializeSpinners() {
+        String[] fromTimeslist = getResources().getStringArray(R.array.time_array_from);
+        ArrayAdapter<String> fromDataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, fromTimeslist);
+        fromDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mFromSpinner.setAdapter(fromDataAdapter);
+        String[] toTimeslist = getResources().getStringArray(R.array.time_array_to);
+        ArrayAdapter<String> toDataAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, toTimeslist);
+        toDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mToSpinner.setAdapter(toDataAdapter);
     }
 
     private DatePickerDialog.OnDateSetListener toDateSetListener = new DatePickerDialog.OnDateSetListener() {

@@ -568,7 +568,7 @@
 
                 <Spinner
                     android:id="@+id/from_spinner"
-                    android:layout_width="48dp"
+                    android:layout_width="56dp"
                     android:layout_height="32dp"
                     android:layout_marginLeft="16dp"
                     android:layout_marginStart="16dp"
@@ -616,7 +616,7 @@
 
                 <Spinner
                     android:id="@+id/to_spinner"
-                    android:layout_width="48dp"
+                    android:layout_width="56dp"
                     android:layout_height="32dp"
                     android:layout_marginLeft="16dp"
                     android:layout_marginStart="16dp"
