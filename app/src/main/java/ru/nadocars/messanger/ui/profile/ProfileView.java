@@ -13,5 +13,6 @@ public interface ProfileView {
     void hideCodeLayout();
     void setCarsInfo(GetCarsResponse carsInfo);
     void setBusyDays(GetCarCalendarResponse getCarCalendarResponse);
+    void updateCalendar();
 
 }

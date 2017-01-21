@@ -30,6 +30,15 @@ public interface HttpEndpointsApi {
                             @Field("access_token") String token);
 
     @FormUrlEncoded
+    @POST(HttpApi.ADD_BUSY_DAYS)
+    Call<Object> addBusyDays(@Field("access_token") String token,
+                             @Field("car_id") String carId,
+                             @Field("date_start") String dateStart,
+                             @Field("time_start") String timeStart,
+                             @Field("date_end") String dateEnd,
+                             @Field("time_end") String timeEnd);
+
+    @FormUrlEncoded
     @POST(HttpApi.USER_UPDATE)
     Call<Object> updateUser(@Field("email") String email,
                             @Field("phone") String phone,

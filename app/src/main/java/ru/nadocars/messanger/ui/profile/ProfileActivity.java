@@ -112,8 +112,9 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     private GetCarsResponse mGetCarsResponse;
     private Calendar mToDateCalendar;
     private Calendar mFromDateCalendar;
-    private long mCode;
+    private long mVerificationCode;
     private int mCarCounter;
+    private String mCurrentCarId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -298,8 +299,8 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         mSaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (null != mCodeEditText.getText() && mCodeEditText.getText().toString().equals(String.valueOf(mCode))) {
-                    mProfilePresenter.updateUserInfo(mEmail, mPhone, mToken, mSessionId, mCode);
+                if (null != mCodeEditText.getText() && mCodeEditText.getText().toString().equals(String.valueOf(mVerificationCode))) {
+                    mProfilePresenter.updateUserInfo(mEmail, mPhone, mToken, mSessionId, mVerificationCode);
                 } else {
                     showError("Не верный код");
                 }
@@ -346,6 +347,16 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
                         mFromDateCalendar.get(Calendar.DAY_OF_MONTH)).show();
             }
         });
+        mMarkDaysButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mProfilePresenter.sendBusyDays(mToken, mCurrentCarId,
+                        mFromDateTextView.getText().toString(),
+                        mFromSpinner.getSelectedItem().toString(),
+                        mToDateTextView.getText().toString(),
+                        mToSpinner.getSelectedItem().toString());
+            }
+        });
     }
 
     private void initializeSpinners() {
@@ -382,13 +393,13 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     };
 
     private void setToDateTextView() {
-        String myFormat = "dd/MM/yyyy"; //In which you need put here
+        String myFormat = "dd.MM.yyyy"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
         mToDateTextView.setText(sdf.format(mToDateCalendar.getTime()));
     }
 
     private void fromToDateTextView() {
-        String myFormat = "dd/MM/yyyy"; //In which you need put here
+        String myFormat = "dd.MM.yyyy"; //In which you need put here
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(myFormat, Locale.US);
         mFromDateTextView.setText(simpleDateFormat.format(mFromDateCalendar.getTime()));
     }
@@ -563,7 +574,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         mCodeLinearLayout.setVisibility(View.VISIBLE);
         mToken = token;
         mSessionId = ssesionId;
-        mCode = code;
+        mVerificationCode = code;
     }
 
     @Override
@@ -681,7 +692,13 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         }
     }
 
+    @Override
+    public void updateCalendar() {
+        mProfilePresenter.getCarCalendar(mCurrentCarId);
+    }
+
     private void setCarInfo() {
+        mCurrentCarId = mGetCarsResponse.getResponse().getItems().get(mCarCounter).getId();
         Item car = mGetCarsResponse.getResponse().getItems().get(mCarCounter);
         mProfilePresenter.getCarCalendar(car.getId());
         String carName = car.getMark() + " " + car.getModel() + " " + car.getYear();

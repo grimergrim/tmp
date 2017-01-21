@@ -233,4 +233,23 @@ public class ProfilePresenterImpl implements ProfilePresenter {
             }
         });
     }
+
+    @Override
+    public void sendBusyDays(String token, String carId, String dateStart, String timeStart, String dateEnd, String timeEnd) {
+        Call<Object> addBusyDaysCall = mHttpEndpointApi.addBusyDays(token, carId, dateStart, timeStart, dateEnd, timeEnd);
+        addBusyDaysCall.enqueue(new Callback<Object>() {
+            @Override
+            public void onResponse(Call<Object> call, Response<Object> response) {
+                if (response.isSuccessful() && response.body().toString().contains("1.0")) {
+                    mProfileView.updateCalendar();
+                    mProfileView.showError("Готово");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Object> call, Throwable t) {
+                mProfileView.showError("Ошибка сервера");
+            }
+        });
+    }
 }
