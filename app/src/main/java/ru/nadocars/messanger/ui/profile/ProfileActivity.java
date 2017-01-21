@@ -55,8 +55,10 @@ import static ru.nadocars.messanger.R.id.code;
 
 public class ProfileActivity extends AppCompatActivity implements ProfileView {
 
-    protected static final int CAMERA_REQUEST = 0;
-    protected static final int GALLERY_PICTURE = 1;
+    protected static final int AVATAR_CAMERA_REQUEST = 0;
+    protected static final int AVATAR_GALLERY_REQUEST = 1;
+    protected static final int CAR_CAMERA_REQUEST = 2;
+    protected static final int CAR_GALLERY_REQUEST = 3;
 
     ProfilePresenter mProfilePresenter;
     Navigator mNavigator;
@@ -82,6 +84,8 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     private EditText mDayPriceEditText;
     private EditText mWeekPriceEditText;
     private EditText mMonthPriceEditText;
+    private Button mAddPhotoButton;
+    private Button mDeletePhotoButton;
 
     private long mCode;
 
@@ -188,6 +192,8 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         mDayPriceEditText = (EditText) findViewById(R.id.day_price);
         mWeekPriceEditText = (EditText) findViewById(R.id.week_price);
         mMonthPriceEditText = (EditText) findViewById(R.id.month_price);
+        mAddPhotoButton = (Button) findViewById(R.id.add_photo);
+        mDeletePhotoButton = (Button) findViewById(R.id.remove_photo);
     }
 
     private void setListeners() {
@@ -268,13 +274,23 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         mAvatarImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startDialog();
+                startDialog(AVATAR_CAMERA_REQUEST, AVATAR_GALLERY_REQUEST);
+            }
+        });
+        mAddPhotoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startDialog(CAR_CAMERA_REQUEST, CAR_GALLERY_REQUEST);
             }
         });
     }
 
-    private void startDialog() {
+    private void startDialog(int cameraRequestCode, int galleryRequestCode) {
         GetPictureDialogFragment getPictureDialogFragment = new GetPictureDialogFragment();
+        Bundle bundle = new Bundle();
+        bundle.putInt("camera request code", cameraRequestCode);
+        bundle.putInt("gallery request code", galleryRequestCode);
+        getPictureDialogFragment.setArguments(bundle);
         getPictureDialogFragment.show(getSupportFragmentManager(), "Input email fragment");
     }
 
@@ -283,7 +299,8 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         super.onActivityResult(requestCode, resultCode, data);
         bitmap = null;
         selectedImagePath = null;
-        if (resultCode == RESULT_OK && requestCode == CAMERA_REQUEST) {
+        if (resultCode == RESULT_OK && requestCode == AVATAR_CAMERA_REQUEST
+                || resultCode == RESULT_OK && requestCode == CAR_CAMERA_REQUEST) {
             File f = new File(Environment.getExternalStorageDirectory().toString());
             for (File temp : f.listFiles()) {
                 if (temp.getName().equals("temp.jpg")) {
@@ -297,7 +314,9 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
             }
             try {
                 bitmap = BitmapFactory.decodeFile(f.getAbsolutePath());
-                bitmap = Bitmap.createScaledBitmap(bitmap, 400, 400, true);
+                if (requestCode == AVATAR_CAMERA_REQUEST) {
+                    bitmap = Bitmap.createScaledBitmap(bitmap, 400, 400, true);
+                }
                 int rotate = 0;
                 try {
                     ExifInterface exif = new ExifInterface(f.getAbsolutePath());
@@ -321,15 +340,21 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
                 Matrix matrix = new Matrix();
                 matrix.postRotate(rotate);
                 bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                mAvatarImageView.setImageBitmap(bitmap);
-                sendAvatarToServer(bitmap);
+                if (requestCode == AVATAR_CAMERA_REQUEST) {
+                    mAvatarImageView.setImageBitmap(bitmap);
+                    sendAvatarToServer(bitmap);
+                } else if (requestCode == CAR_CAMERA_REQUEST) {
+                    addPhotoToList(bitmap);
+                    sendCarPhotoToServer(bitmap);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
 
-        } else if (resultCode == RESULT_OK && requestCode == GALLERY_PICTURE) {
+        } else if (resultCode == RESULT_OK && requestCode == AVATAR_GALLERY_REQUEST
+                || resultCode == RESULT_OK && requestCode == CAR_GALLERY_REQUEST) {
             if (data != null) {
-                String[] filePathColumn = { MediaStore.Images.Media.DATA };
+                String[] filePathColumn = {MediaStore.Images.Media.DATA};
                 Cursor cursor = getContentResolver().query(data.getData(), filePathColumn, null, null, null);
                 if (cursor != null) {
                     cursor.moveToFirst();
@@ -338,9 +363,15 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
                     cursor.close();
                 }
                 bitmap = BitmapFactory.decodeFile(selectedImagePath);
-                bitmap = Bitmap.createScaledBitmap(bitmap, 400, 400, false);
-                mAvatarImageView.setImageBitmap(bitmap);
-                sendAvatarToServer(bitmap);
+                if (requestCode == AVATAR_GALLERY_REQUEST) {
+                    bitmap = Bitmap.createScaledBitmap(bitmap, 400, 400, false);
+                    mAvatarImageView.setImageBitmap(bitmap);
+                    sendAvatarToServer(bitmap);
+                } else if (requestCode == CAR_GALLERY_REQUEST) {
+                    addPhotoToList(bitmap);
+                    sendCarPhotoToServer(bitmap);
+                }
+
             } else {
                 Toast.makeText(getApplicationContext(), "Cancelled", Toast.LENGTH_SHORT).show();
             }
@@ -349,6 +380,14 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
 
     private void sendAvatarToServer(Bitmap bitmap) {
         //TODO add send method to presenter
+    }
+
+    private void sendCarPhotoToServer(Bitmap bitmap) {
+        //TODO add send method to presenter
+    }
+
+    private void addPhotoToList(Bitmap bitmap) {
+        //TODO implement
     }
 
     private void initCalendar() {
