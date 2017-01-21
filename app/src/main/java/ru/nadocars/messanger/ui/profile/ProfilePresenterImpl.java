@@ -132,16 +132,18 @@ public class ProfilePresenterImpl implements ProfilePresenter {
 
     @Override
     public void getCars(String token) {
-        Call<GetCarsResponse> getCarsCall = mHttpEndpointApi.getCars(token, "", 100);
+        Call<GetCarsResponse> getCarsCall = mHttpEndpointApi.getCars(token, 0, 100);
         getCarsCall.enqueue(new Callback<GetCarsResponse>() {
             @Override
             public void onResponse(Call<GetCarsResponse> call, Response<GetCarsResponse> response) {
-                System.out.println();
+                if (response.isSuccessful()) {
+                    mProfileView.setCarsInfo(response.body());
+                }
             }
 
             @Override
             public void onFailure(Call<GetCarsResponse> call, Throwable t) {
-                System.out.println();
+                mProfileView.showError("Ошибка соединения с сервером");
             }
         });
     }

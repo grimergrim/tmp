@@ -37,12 +37,16 @@ import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.util.List;
 
 import ru.nadocars.messanger.R;
 import ru.nadocars.messanger.api.SharedPreferencesApi;
 import ru.nadocars.messanger.asynctasks.LogOutTask;
 import ru.nadocars.messanger.data.repo.ContactsRepo;
 import ru.nadocars.messanger.data.repo.MessagesRepo;
+import ru.nadocars.messanger.json.car.GetCarsResponse;
+import ru.nadocars.messanger.json.car.Item;
+import ru.nadocars.messanger.json.car.Photo;
 import ru.nadocars.messanger.json.user.GetUserResponse;
 import ru.nadocars.messanger.ui.navigation.Navigator;
 import ru.nadocars.messanger.ui.navigation.NavigatorImpl;
@@ -74,6 +78,11 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     private String mPhone;
     private String mToken;
     private String mSessionId;
+    private TextView mCarTitleEditText;
+    private EditText mDayPriceEditText;
+    private EditText mWeekPriceEditText;
+    private EditText mMonthPriceEditText;
+
     private long mCode;
 
     private Bitmap bitmap;
@@ -97,12 +106,11 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
                 .getString(SharedPreferencesApi.TOKEN, null);
         if (null != token) {
             mProfilePresenter.getUserInfo(token);
+            mProfilePresenter.getCars(token);
         }
         if (null != mUserAvatar) {
             mUserAvatar.setVisibility(View.GONE);
         }
-        mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager(), 3);
-        mViewPager.setAdapter(mPagerAdapter);
         initCalendar();
         if (null != mEmailTextView) {
 //            mEmailTextView.clearFocus();
@@ -176,6 +184,10 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         mCodeLinearLayout = (LinearLayout) findViewById(R.id.code_layout);
         mCodeEditText = (EditText) findViewById(code);
         mSaveButton = (Button) findViewById(R.id.save_button);
+        mCarTitleEditText = (TextView) findViewById(R.id.car_title);
+        mDayPriceEditText = (EditText) findViewById(R.id.day_price);
+        mWeekPriceEditText = (EditText) findViewById(R.id.week_price);
+        mMonthPriceEditText = (EditText) findViewById(R.id.month_price);
     }
 
     private void setListeners() {
@@ -389,7 +401,6 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
             mUpdateButton.setVisibility(View.GONE);
             Picasso.with(getApplicationContext()).load(profileInfo.getResponse().getAvatar()).into(mAvatarImageView);
         }
-
     }
 
     @Override
@@ -416,23 +427,40 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         mCodeLinearLayout.setVisibility(View.GONE);
     }
 
+    @Override
+    public void setCarsInfo(GetCarsResponse carsInfo) {
+        Item car = carsInfo.getResponse().getItems().get(0);
+        String carName = car.getMark() + " " + car.getModel() + " " + car.getYear();
+        mCarTitleEditText.setText(carName);
+        mDayPriceEditText.setText(String.valueOf(car.getDayPrice()));
+        mWeekPriceEditText.setText(String.valueOf(car.getWeekPrice()));
+        mMonthPriceEditText.setText(String.valueOf(car.getMonthPrice()));
+        mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager(), car.getPhotos());
+        mViewPager.setAdapter(mPagerAdapter);
+
+    }
+
     private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
 
-        private int mNumberOfPages;
+        private List<Photo> mPhotoList;
 
-        public ScreenSlidePagerAdapter(FragmentManager fragmentManager, int numberOfPages) {
+        public ScreenSlidePagerAdapter(FragmentManager fragmentManager, List<Photo> photos) {
             super(fragmentManager);
-            mNumberOfPages = numberOfPages;
+            mPhotoList = photos;
         }
 
         @Override
         public Fragment getItem(int position) {
-            return new ScreenSlidePageFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString("url", mPhotoList.get(position).getImage600x360());
+            ScreenSlidePageFragment screenSlidePageFragment = new ScreenSlidePageFragment();
+            screenSlidePageFragment.setArguments(bundle);
+            return screenSlidePageFragment;
         }
 
         @Override
         public int getCount() {
-            return mNumberOfPages;
+            return mPhotoList.size();
         }
     }
 

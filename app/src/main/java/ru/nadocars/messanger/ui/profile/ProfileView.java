@@ -1,5 +1,6 @@
 package ru.nadocars.messanger.ui.profile;
 
+import ru.nadocars.messanger.json.car.GetCarsResponse;
 import ru.nadocars.messanger.json.user.GetUserResponse;
 
 public interface ProfileView {
@@ -9,5 +10,6 @@ public interface ProfileView {
     void requestVerificationCode(String email, String phoneNumber, String token, String ssesionId, long code);
     void hideUpdateButton();
     void hideCodeLayout();
+    void setCarsInfo(GetCarsResponse carsInfo);
 
 }

@@ -29,9 +29,9 @@ public interface HttpEndpointsApi {
                             @Field("code") long code);
 
     @FormUrlEncoded
-    @POST(HttpApi.USER_UPDATE)
+    @POST(HttpApi.CARS_GET)
     Call<GetCarsResponse> getCars(@Field("access_token") String token,
-                                  @Field("offset") String offset,
+                                  @Field("offset") int offset,
                                   @Field("count") int count);
 
 }
