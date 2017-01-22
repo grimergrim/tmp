@@ -18,5 +18,6 @@ public interface ProfileView {
     void updateCalendar();
     ContentResolver getContentResolver();
     void updatePriceStatus(String viewName);
+    void setCarPhotoId(String photoId);
 
 }

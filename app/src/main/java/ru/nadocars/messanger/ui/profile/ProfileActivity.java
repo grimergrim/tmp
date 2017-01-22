@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.media.ExifInterface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -110,7 +111,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     private TextView mWeekPriceTitleTextView;
     private EditText mMonthPriceEditText;
     private TextView mMonthPriceTitleTextView;
-
+    private Button mGoToWebButton;
     private Bitmap bitmap;
     private String selectedImagePath;
     private String mImagePath;
@@ -245,6 +246,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         mWeekPriceTitleTextView = (TextView) findViewById(R.id.week_price_title);
         mMonthPriceEditText = (EditText) findViewById(R.id.month_price);
         mMonthPriceTitleTextView = (TextView) findViewById(R.id.month_price_title);
+        mGoToWebButton = (Button) findViewById(R.id.go_to_web);
     }
 
     private void setListeners() {
@@ -453,8 +455,9 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         mDeletePhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO add car id and photo id to delete
-                mProfilePresenter.deleteCarPhoto(mToken, "", "");
+                mProfilePresenter.deleteCarPhoto(mToken, mCurrentCarId,
+                        mGetCarsResponse.getResponse().getItems().get(mCarCounter - 1).getPhotos()
+                                .get(mViewPager.getCurrentItem()).getId());
             }
         });
         mNextCarButton.setOnClickListener(new View.OnClickListener() {
@@ -487,6 +490,13 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
                         mFromSpinner.getSelectedItem().toString(),
                         mToDateTextView.getText().toString(),
                         mToSpinner.getSelectedItem().toString());
+            }
+        });
+        mGoToWebButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://nadocars.ru/profile/"));
+                startActivity(intent);
             }
         });
     }
@@ -641,7 +651,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     }
 
     private void sendAvatarToServer(String uri) {
-        mProfilePresenter.uploadAvatar(mToken, uri, getApplicationContext(), this);
+        mProfilePresenter.uploadAvatar(mToken, uri);
     }
 
     private void sendCarPhotoToServer(String uri) {
@@ -654,24 +664,6 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         ((ScreenSlidePagerAdapter) mViewPager.getAdapter()).setPhotoList(photoList);
         mViewPager.setCurrentItem(mViewPager.getAdapter().getCount());
     }
-
-//    private void initCalendar() {
-//        if (null != mCalendarView) {
-//            mCalendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_NONE);
-//            mCalendarView.addDecorator(new DayViewDecorator() {
-//                @Override
-//                public boolean shouldDecorate(CalendarDay day) {
-//                    return true;
-//                }
-//
-//                @Override
-//                public void decorate(DayViewFacade view) {
-//                    view.setBackgroundDrawable(ContextCompat.getDrawable(getApplicationContext(),
-//                            R.drawable.shape_calendar_busy_day));
-//                }
-//            });
-//        }
-//    }
 
     @Override
     protected void onDestroy() {
@@ -852,6 +844,11 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         } else if (viewName.equals("month")) {
             mMonthPriceTitleTextView.setText("в месяц");
         }
+    }
+
+    @Override
+    public void setCarPhotoId(String photoId) {
+        mGetCarsResponse.getResponse().getItems().get(mCarCounter).getPhotos().get(mGetCarsResponse.getResponse().getItems().get(mCarCounter).getPhotos().size()).setId(photoId);
     }
 
     private void setCarInfo() {

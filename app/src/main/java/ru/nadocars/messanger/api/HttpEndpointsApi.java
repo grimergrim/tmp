@@ -12,6 +12,7 @@ import retrofit2.http.POST;
 import retrofit2.http.Part;
 import ru.nadocars.messanger.json.car.GetCarsResponse;
 import ru.nadocars.messanger.json.car.calendar.GetCarCalendarResponse;
+import ru.nadocars.messanger.json.car.photo.UploadPhotoResponse;
 import ru.nadocars.messanger.json.user.GetUserResponse;
 
 public interface HttpEndpointsApi {
@@ -62,14 +63,9 @@ public interface HttpEndpointsApi {
 
     @FormUrlEncoded
     @POST(HttpApi.DELETE_CAR_PHOTO)
-    Call<ResponseBody> deleteCarPhoto(@Field("access_token") String token,
+    Call<Object> deleteCarPhoto(@Field("access_token") String token,
                                       @Field("car_id") String carId,
                                       @Field("photo_id") String photoId);
-
-//    @Multipart
-//    @POST(HttpApi.UPLOAD_USER_AVATAR)
-//    Call<ResponseBody> uploadUserAvatar(@Part("access_token") RequestBody token,
-//                                        @Part("avatar") RequestBody file);
 
     @Multipart
     @POST(HttpApi.UPLOAD_USER_AVATAR)
@@ -78,9 +74,9 @@ public interface HttpEndpointsApi {
 
     @Multipart
     @POST(HttpApi.UPLOAD_CAR_PHOTO)
-    Call<ResponseBody> uploadCarPhoto(@Part("access_token") RequestBody token,
-                                      @Part("car_id") RequestBody carId,
-                                      @Part("car_photo") RequestBody file);
+    Call<UploadPhotoResponse> uploadCarPhoto(@Part("access_token") RequestBody token,
+                                             @Part("car_id") RequestBody carId,
+                                             @Part MultipartBody.Part file);
 
 }
 

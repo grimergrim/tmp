@@ -646,6 +646,22 @@
                     app:layout_constraintRight_toRightOf="@+id/to_date"
                     app:layout_constraintTop_toBottomOf="@+id/to_spinner"/>
 
+
+                <Button
+                    android:id="@+id/go_to_web"
+                    android:layout_width="0dp"
+                    android:layout_height="32dp"
+                    android:layout_marginTop="24dp"
+                    android:background="@drawable/shape_button"
+                    android:minHeight="32dp"
+                    android:text="Перейти на сайт"
+                    android:textAllCaps="false"
+                    android:textColor="@android:color/white"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/mark_days_button"/>
+
+
             </android.support.constraint.ConstraintLayout>
 
         </LinearLayout>

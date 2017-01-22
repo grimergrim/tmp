@@ -1,8 +1,5 @@
 package ru.nadocars.messanger.ui.profile;
 
-import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
-
 import ru.nadocars.messanger.ui.Presenter;
 
 public interface ProfilePresenter extends Presenter<ProfileView> {
@@ -11,7 +8,7 @@ public interface ProfilePresenter extends Presenter<ProfileView> {
     void updateUserInfo(String email, String phoneNumber, String token);
     void updateUserInfo(String email, String phoneNumber, String token, String ssesionId, long code);
     void getCars(String token);
-    void uploadAvatar(String token, String uri, Context context, AppCompatActivity appCompatActivity);
+    void uploadAvatar(String token, String uri);
     void uploadCarPhoto(String token, String carId, String uri);
     void deleteCarPhoto(String token, String carId, String photoId);
     void getCarCalendar(String carId);

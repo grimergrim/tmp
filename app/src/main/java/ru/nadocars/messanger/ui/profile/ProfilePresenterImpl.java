@@ -1,7 +1,5 @@
 package ru.nadocars.messanger.ui.profile;
 
-import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
@@ -21,6 +19,7 @@ import ru.nadocars.messanger.api.HttpEndpointsApi;
 import ru.nadocars.messanger.http.RetrofitFactory;
 import ru.nadocars.messanger.json.car.GetCarsResponse;
 import ru.nadocars.messanger.json.car.calendar.GetCarCalendarResponse;
+import ru.nadocars.messanger.json.car.photo.UploadPhotoResponse;
 import ru.nadocars.messanger.json.user.GetUserResponse;
 import ru.nadocars.messanger.json.user.update.error102.UserUpdateError102;
 import ru.nadocars.messanger.json.user.update.error103.UserUpdateError103;
@@ -106,8 +105,10 @@ public class ProfilePresenterImpl implements ProfilePresenter {
     }
 
     @Override
-    public void updateUserInfo(String email, String phoneNumber, String token, String sesionId, long code) {
-        Call<Object> updateUserCall = mHttpEndpointApi.updateUser(email, phoneNumber, token, sesionId, code);
+    public void updateUserInfo(String email, String phoneNumber, String token,
+                               String sesionId, long code) {
+        Call<Object> updateUserCall =
+                mHttpEndpointApi.updateUser(email, phoneNumber, token, sesionId, code);
         updateUserCall.enqueue(new Callback<Object>() {
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
@@ -161,18 +162,17 @@ public class ProfilePresenterImpl implements ProfilePresenter {
     }
 
     @Override
-    public void uploadAvatar(String token, String uri, Context context, AppCompatActivity appCompatActivity) {
-//        UploadUserAvatarTask uploadUserAvatarTask = new UploadUserAvatarTask(token, uri, context, appCompatActivity);
-//        uploadUserAvatarTask.execute();
+    public void uploadAvatar(String token, String uri) {
         File file = new File(uri);
-        RequestBody requestFile = RequestBody.create(MediaType.parse(MimeTypeMap.getSingleton().getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(uri))), file);
-        MultipartBody.Part body = MultipartBody.Part.createFormData("avatar", file.getName(), requestFile);
+        RequestBody requestFile = RequestBody.create(MediaType.parse(MimeTypeMap.getSingleton()
+                .getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(uri))), file);
+        MultipartBody.Part body = MultipartBody.Part.createFormData("avatar", file.getName(),
+                requestFile);
         RequestBody tokenBody = RequestBody.create(okhttp3.MultipartBody.FORM, token);
         Call<ResponseBody> call = mHttpEndpointApi.uploadUserAvatar(tokenBody, body);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onResponse(Call<ResponseBody> call,
-                                   Response<ResponseBody> response) {
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 Log.v("Upload", "success");
             }
 
@@ -181,63 +181,51 @@ public class ProfilePresenterImpl implements ProfilePresenter {
                 Log.e("Upload error:", t.getMessage());
             }
         });
-
-
-//        RequestBody fileBody = RequestBody.create(MediaType.parse("image/jpeg"), file);
-//        RequestBody tokenBody = RequestBody.create(MediaType.parse("text/plain"), token);
-//        Call<ResponseBody> call = mHttpEndpointApi.uploadUserAvatar(tokenBody, fileBody);
-//        call.enqueue(new Callback<ResponseBody>() {
-//            @Override
-//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-//                System.out.println();
-//                //TODO add implementation
-//            }
-//
-//            @Override
-//            public void onFailure(Call<ResponseBody> call, Throwable t) {
-//                System.out.println();
-//                //TODO add implementation
-//            }
-//        });
     }
-
 
     @Override
     public void uploadCarPhoto(String token, String carId, String uri) {
         File file = new File(uri);
-        RequestBody fileBody = RequestBody.create(MediaType.parse("image/jpeg"), file);
-        RequestBody tokenBody = RequestBody.create(MediaType.parse("text/plain"), token);
-        RequestBody carIdBody = RequestBody.create(MediaType.parse("text/plain"), carId);
-        Call<ResponseBody> call = mHttpEndpointApi.uploadCarPhoto(tokenBody, carIdBody, fileBody);
-        call.enqueue(new Callback<ResponseBody>() {
+        RequestBody requestFile = RequestBody.create(MediaType.parse(MimeTypeMap.getSingleton()
+                .getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(uri))), file);
+        MultipartBody.Part body = MultipartBody.Part.createFormData("photo1", file.getName(),
+                requestFile);
+        RequestBody tokenBody = RequestBody.create(okhttp3.MultipartBody.FORM, token);
+        RequestBody carIdBody = RequestBody.create(okhttp3.MultipartBody.FORM, carId);
+        Call<UploadPhotoResponse> call = mHttpEndpointApi.uploadCarPhoto(tokenBody, carIdBody, body);
+        call.enqueue(new Callback<UploadPhotoResponse>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                System.out.println();
-                //TODO add implementation
+            public void onResponse(Call<UploadPhotoResponse> call, Response<UploadPhotoResponse> response) {
+                if (response.isSuccessful() && null != response.body()) {
+                    UploadPhotoResponse uploadPhotoResponse = response.body();
+                    mProfileView.setCarPhotoId(uploadPhotoResponse.getResponse().get(0).getId());
+                    mProfileView.showError("Фото загружено");
+                }
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                System.out.println();
-                //TODO add implementation
+            public void onFailure(Call<UploadPhotoResponse> call, Throwable t) {
+                mProfileView.showError("Ошибка сервера");
             }
         });
     }
 
     @Override
-    public void deleteCarPhoto(String token, String carId, String photoId) {
-        Call<ResponseBody> deleteCarPhotoCall = mHttpEndpointApi.deleteCarPhoto(token, carId, photoId);
-        deleteCarPhotoCall.enqueue(new Callback<ResponseBody>() {
+    public void deleteCarPhoto(final String token, String carId, String photoId) {
+        Call<Object> deleteCarPhotoCall = mHttpEndpointApi.deleteCarPhoto(token, carId, photoId);
+        deleteCarPhotoCall.enqueue(new Callback<Object>() {
             @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                System.out.println();
-                //TODO add implementation
+            public void onResponse(Call<Object> call, Response<Object> response) {
+                if (null != response && response.isSuccessful()) {
+                    response.body().toString().equals("1.0");
+                    getCars(token);
+                    mProfileView.showError("Фото удалено");
+                }
             }
 
             @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                System.out.println();
-                //TODO add implementation
+            public void onFailure(Call<Object> call, Throwable t) {
+                mProfileView.showError("Ошибка сервера");
             }
         });
     }
