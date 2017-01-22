@@ -19,5 +19,6 @@ public interface ProfileView {
     ContentResolver getContentResolver();
     void updatePriceStatus(String viewName);
     void setCarPhotoId(String photoId);
+    void deletePhotoFromViewPager(String carId, String photoId);
 
 }

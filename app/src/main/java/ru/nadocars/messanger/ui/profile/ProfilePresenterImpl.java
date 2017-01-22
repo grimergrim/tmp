@@ -57,8 +57,7 @@ public class ProfilePresenterImpl implements ProfilePresenter {
 
             @Override
             public void onFailure(Call<GetUserResponse> call, Throwable t) {
-                //TODO add error codes handle
-                mProfileView.showError("Some error while getting profile info");
+                mProfileView.showError("Ошибка сервера");
             }
         });
     }
@@ -211,14 +210,14 @@ public class ProfilePresenterImpl implements ProfilePresenter {
     }
 
     @Override
-    public void deleteCarPhoto(final String token, String carId, String photoId) {
+    public void deleteCarPhoto(final String token, final String carId, final String photoId) {
         Call<Object> deleteCarPhotoCall = mHttpEndpointApi.deleteCarPhoto(token, carId, photoId);
         deleteCarPhotoCall.enqueue(new Callback<Object>() {
             @Override
             public void onResponse(Call<Object> call, Response<Object> response) {
                 if (null != response && response.isSuccessful()) {
                     response.body().toString().equals("1.0");
-                    getCars(token);
+                    mProfileView.deletePhotoFromViewPager(carId, photoId);
                     mProfileView.showError("Фото удалено");
                 }
             }

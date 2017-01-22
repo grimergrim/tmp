@@ -848,7 +848,44 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
 
     @Override
     public void setCarPhotoId(String photoId) {
-        mGetCarsResponse.getResponse().getItems().get(mCarCounter).getPhotos().get(mGetCarsResponse.getResponse().getItems().get(mCarCounter).getPhotos().size()).setId(photoId);
+        Photo photo = new Photo();
+        photo.setId(photoId);
+        List<Photo> photos = mGetCarsResponse.getResponse().getItems().get(mCarCounter - 1).getPhotos();
+        photos.add(photo);
+        mGetCarsResponse.getResponse().getItems().get(mCarCounter - 1).setPhotos(photos);
+        System.out.println();
+    }
+
+    @Override
+    public void deletePhotoFromViewPager(String carId, String photoId) {
+        int y = -1;
+        for (Item item : mGetCarsResponse.getResponse().getItems()) {
+            if (item.getId().equals(carId)) {
+                List<Photo> photos = new ArrayList<>();
+                for (int i = 0; i < item.getPhotos().size(); i++) {
+                    if (!item.getPhotos().get(i).getId().equals(photoId)) {
+                        photos.add(item.getPhotos().get(i));
+                    } else {
+                        y = i;
+                    }
+                }
+                item.setPhotos(photos);
+            }
+        }
+        List<String> photoList = ((ScreenSlidePagerAdapter) mViewPager.getAdapter()).getPhotoList();
+        List<String> photoList2 = new ArrayList<>();
+        if (y != -1) {
+            for (int i = 0; i < photoList.size(); i++) {
+                if (i != y) {
+                    photoList2.add(photoList.get(i));
+                }
+            }
+            ((ScreenSlidePagerAdapter) mViewPager.getAdapter()).setPhotoList(photoList2);
+            if (y > 0) {
+                mViewPager.setCurrentItem(y - 1);
+            }
+        }
+
     }
 
     private void setCarInfo() {
