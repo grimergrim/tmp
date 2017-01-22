@@ -89,11 +89,11 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     private Button mSaveButton;
     private String mEmail;
     private String mPhone;
+    private String mDayPrice;
+    private String mWeekPrice;
+    private String mMonthPrice;
     private String mSessionId;
     private TextView mCarTitleEditText;
-    private EditText mDayPriceEditText;
-    private EditText mWeekPriceEditText;
-    private EditText mMonthPriceEditText;
     private Button mAddPhotoButton;
     private Button mDeletePhotoButton;
     private Button mNextCarButton;
@@ -104,6 +104,12 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     private Spinner mFromSpinner;
     private Spinner mToSpinner;
     private Button mMarkDaysButton;
+    private EditText mDayPriceEditText;
+    private TextView mDayPriceTitleTextView;
+    private EditText mWeekPriceEditText;
+    private TextView mWeekPriceTitleTextView;
+    private EditText mMonthPriceEditText;
+    private TextView mMonthPriceTitleTextView;
 
     private Bitmap bitmap;
     private String selectedImagePath;
@@ -144,13 +150,20 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         }
 //        initCalendar();
         if (null != mEmailTextView) {
-//            mEmailTextView.clearFocus();
             mEmailTextView.setFocusable(false);
 
         }
         if (null != mPhoneTextView) {
-//            mPhoneTextView.clearFocus();\
             mPhoneTextView.setFocusable(false);
+        }
+        if ((null != mDayPriceEditText)) {
+            mDayPriceEditText.setFocusable(false);
+        }
+        if ((null != mWeekPriceEditText)) {
+            mWeekPriceEditText.setFocusable(false);
+        }
+        if ((null != mMonthPriceEditText)) {
+            mMonthPriceEditText.setFocusable(false);
         }
         if (null != mCodeLinearLayout) {
             mCodeLinearLayout.setVisibility(View.GONE);
@@ -216,9 +229,6 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         mCodeEditText = (EditText) findViewById(code);
         mSaveButton = (Button) findViewById(R.id.save_button);
         mCarTitleEditText = (TextView) findViewById(R.id.car_title);
-        mDayPriceEditText = (EditText) findViewById(R.id.day_price);
-        mWeekPriceEditText = (EditText) findViewById(R.id.week_price);
-        mMonthPriceEditText = (EditText) findViewById(R.id.month_price);
         mAddPhotoButton = (Button) findViewById(R.id.add_photo);
         mDeletePhotoButton = (Button) findViewById(R.id.remove_photo);
         mNextCarButton = (Button) findViewById(R.id.next_car);
@@ -229,6 +239,12 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         mFromSpinner = (Spinner) findViewById(R.id.from_spinner);
         mToSpinner = (Spinner) findViewById(R.id.to_spinner);
         mMarkDaysButton = (Button) findViewById(R.id.mark_days_button);
+        mDayPriceEditText = (EditText) findViewById(R.id.day_price);
+        mDayPriceTitleTextView = (TextView) findViewById(R.id.day_price_title);
+        mWeekPriceEditText = (EditText) findViewById(R.id.week_price);
+        mWeekPriceTitleTextView = (TextView) findViewById(R.id.week_price_title);
+        mMonthPriceEditText = (EditText) findViewById(R.id.month_price);
+        mMonthPriceTitleTextView = (TextView) findViewById(R.id.month_price_title);
     }
 
     private void setListeners() {
@@ -279,6 +295,122 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 if (!mPhone.equals(s)) {
                     mUpdateButton.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        mDayPriceEditText.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                mDayPriceEditText.setFocusableInTouchMode(true);
+                return false;
+            }
+        });
+        mDayPriceEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (null != mDayPrice && !mDayPrice.equals(s)) {
+                    mDayPriceTitleTextView.setText("Обновить");
+                }
+            }
+        });
+        mWeekPriceEditText.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                mWeekPriceEditText.setFocusableInTouchMode(true);
+                return false;
+            }
+        });
+        mWeekPriceEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (null != mWeekPrice && !mWeekPrice.equals(s)) {
+                    mWeekPriceTitleTextView.setText("Обновить");
+                    if (checkPrice(s.toString()) && (Double.parseDouble(s.toString())) == 0) {
+                        mMonthPriceEditText.setText("0");
+                    }
+                }
+            }
+        });
+        mMonthPriceEditText.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                mMonthPriceEditText.setFocusableInTouchMode(true);
+                return false;
+            }
+        });
+        mMonthPriceEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (null != mMonthPrice && !mMonthPrice.equals(s) && !s.toString().equals("0")) {
+                    mMonthPriceTitleTextView.setText("Обновить");
+                    if (checkPrice(mWeekPriceEditText.getText().toString())
+                            && (Double.parseDouble(mWeekPriceEditText.getText().toString())) == 0) {
+                        mMonthPriceEditText.setText("0");
+                    }
+                }
+            }
+        });
+        mDayPriceTitleTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mDayPriceTitleTextView.getText().toString().equals("Обновить")
+                        && checkPrice(mDayPriceEditText.getText().toString())) {
+                    if (!(Double.parseDouble(mDayPriceEditText.getText().toString()) > 0)) {
+                        showError("Цена должна быть больше 0");
+                    } else {
+                        mProfilePresenter.updateCarPrice(mToken, mCurrentCarId, "day",
+                                mDayPriceEditText.getText().toString());
+                    }
+                }
+            }
+        });
+        mWeekPriceTitleTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mWeekPriceTitleTextView.getText().toString().equals("Обновить")
+                        && checkPrice(mDayPriceEditText.getText().toString())) {
+                    mProfilePresenter.updateCarPrice(mToken, mCurrentCarId, "week",
+                            mWeekPriceEditText.getText().toString());
+                }
+            }
+        });
+        mMonthPriceTitleTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mMonthPriceTitleTextView.getText().toString().equals("Обновить")
+                        && checkPrice(mDayPriceEditText.getText().toString())) {
+                    mProfilePresenter.updateCarPrice(mToken, mCurrentCarId, "month",
+                            mMonthPriceEditText.getText().toString());
                 }
             }
         });
@@ -357,6 +489,18 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
                         mToSpinner.getSelectedItem().toString());
             }
         });
+    }
+
+    private boolean checkPrice(String price) {
+        if (!price.matches("[0-9]+")) {
+            showError("Только цифры");
+            return false;
+        } else if (!(price.length() > 0)) {
+            showError("Укажите цену");
+            return false;
+        } else {
+            return true;
+        }
     }
 
     private void initializeSpinners() {
@@ -637,6 +781,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
                     }
                     return false;
                 }
+
                 @Override
                 public void decorate(DayViewFacade view) {
                     view.setBackgroundDrawable(ContextCompat.getDrawable(getApplicationContext(),
@@ -682,10 +827,11 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
                     }
                     return true;
                 }
+
                 @Override
                 public void decorate(DayViewFacade view) {
                     view.setBackgroundDrawable(ContextCompat.getDrawable(getApplicationContext(),
-                                R.drawable.shape_calendar_free_day));
+                            R.drawable.shape_calendar_free_day));
                 }
             });
             mCalendarView.addDecorators(dayViewDecorators);
@@ -697,6 +843,17 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         mProfilePresenter.getCarCalendar(mCurrentCarId);
     }
 
+    @Override
+    public void updatePriceStatus(String viewName) {
+        if (viewName.equals("day")) {
+            mDayPriceTitleTextView.setText("в день");
+        } else if (viewName.equals("week")) {
+            mWeekPriceTitleTextView.setText("в неделю");
+        } else if (viewName.equals("month")) {
+            mMonthPriceTitleTextView.setText("в месяц");
+        }
+    }
+
     private void setCarInfo() {
         mCurrentCarId = mGetCarsResponse.getResponse().getItems().get(mCarCounter).getId();
         Item car = mGetCarsResponse.getResponse().getItems().get(mCarCounter);
@@ -706,6 +863,9 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         mDayPriceEditText.setText(String.valueOf(car.getDayPrice()));
         mWeekPriceEditText.setText(String.valueOf(car.getWeekPrice()));
         mMonthPriceEditText.setText(String.valueOf(car.getMonthPrice()));
+        mDayPrice = String.valueOf(car.getDayPrice());
+        mWeekPrice = String.valueOf(car.getWeekPrice());
+        mMonthPrice = String.valueOf(car.getMonthPrice());
         List<String> photoUrls = new ArrayList<>();
         for (Photo photo : car.getPhotos()) {
             photoUrls.add(photo.getImage600x360());

@@ -54,6 +54,13 @@ public interface HttpEndpointsApi {
                                   @Field("count") int count);
 
     @FormUrlEncoded
+    @POST(HttpApi.UPDATE_CAR_PRICE)
+    Call<ResponseBody> updateCarPrice(@Field("access_token") String token,
+                                      @Field("car_id") String carId,
+                                      @Field("type") String type,
+                                      @Field("price") String price);
+
+    @FormUrlEncoded
     @POST(HttpApi.DELETE_CAR_PHOTO)
     Call<ResponseBody> deleteCarPhoto(@Field("access_token") String token,
                                       @Field("car_id") String carId,

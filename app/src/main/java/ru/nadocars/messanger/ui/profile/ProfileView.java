@@ -17,5 +17,6 @@ public interface ProfileView {
     void setBusyDays(GetCarCalendarResponse getCarCalendarResponse);
     void updateCalendar();
     ContentResolver getContentResolver();
+    void updatePriceStatus(String viewName);
 
 }

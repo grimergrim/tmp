@@ -26,5 +26,6 @@ public interface HttpApi {
     String DELETE_CAR_PHOTO = "cars.deletephoto/";
     String GET_CARS_CALENDAR = "cars.calendar/";
     String ADD_BUSY_DAYS = "cars.addbusy/";
+    String UPDATE_CAR_PRICE = "cars.price/";
 
 }

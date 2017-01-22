@@ -16,5 +16,6 @@ public interface ProfilePresenter extends Presenter<ProfileView> {
     void deleteCarPhoto(String token, String carId, String photoId);
     void getCarCalendar(String carId);
     void sendBusyDays(String token, String carId, String dateStart, String timeStart, String dateEnd, String timeEnd);
+    void updateCarPrice(String token, String carId, String type, String price);
 
 }
