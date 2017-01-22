@@ -119,6 +119,8 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mProfilePresenter = ProfilePresenterImpl.getPreLoginPresenter();
+        mProfilePresenter.setView(this);
         mCarCounter = 0;
         mToDateCalendar = Calendar.getInstance();
         mFromDateCalendar = Calendar.getInstance();
@@ -130,8 +132,6 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
             mCarsConstraintLayout.setVisibility(View.GONE);
         Button exitbutton = (Button) findViewById(R.id.exit_button);
         Button settingsButton = (Button) findViewById(R.id.check_interval);
-        mProfilePresenter = ProfilePresenterImpl.getPreLoginPresenter();
-        mProfilePresenter.setView(this);
         mNavigator = new NavigatorImpl();
         mToken = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
                 .getString(SharedPreferencesApi.TOKEN, null);
@@ -497,11 +497,11 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     }
 
     private void sendAvatarToServer(String uri) {
-        mProfilePresenter.uploadAvatar(mToken, uri);
+        mProfilePresenter.uploadAvatar(mToken, uri, getApplicationContext(), this);
     }
 
     private void sendCarPhotoToServer(String uri) {
-        mProfilePresenter.uploadCarPhoto(mToken, uri);
+        mProfilePresenter.uploadCarPhoto(mToken, mCurrentCarId, uri);
     }
 
     private void addPhotoToList(String uri) {
@@ -530,8 +530,8 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
 //    }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onDestroy() {
+        super.onDestroy();
         mProfilePresenter.setView(null);
     }
 

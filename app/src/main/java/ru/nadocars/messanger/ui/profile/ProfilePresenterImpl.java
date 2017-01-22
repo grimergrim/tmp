@@ -1,5 +1,8 @@
 package ru.nadocars.messanger.ui.profile;
 
+import android.content.Context;
+import android.support.v7.app.AppCompatActivity;
+
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
@@ -12,6 +15,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import ru.nadocars.messanger.api.HttpEndpointsApi;
+import ru.nadocars.messanger.asynctasks.UploadUserAvatarTask;
 import ru.nadocars.messanger.http.RetrofitFactory;
 import ru.nadocars.messanger.json.car.GetCarsResponse;
 import ru.nadocars.messanger.json.car.calendar.GetCarCalendarResponse;
@@ -155,32 +159,54 @@ public class ProfilePresenterImpl implements ProfilePresenter {
     }
 
     @Override
-    public void uploadAvatar(String token, String uri) {
-        File file = new File(uri);
-        RequestBody fileBody = RequestBody.create(MediaType.parse("image/jpeg"), file);
-        RequestBody tokenBody = RequestBody.create(MediaType.parse("text/plain"), token);
-        Call<ResponseBody> call = mHttpEndpointApi.uploadUserAvatar(tokenBody, fileBody);
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                System.out.println();
-                //TODO add implementation
-            }
+    public void uploadAvatar(String token, String uri, Context context, AppCompatActivity appCompatActivity) {
+        UploadUserAvatarTask uploadUserAvatarTask = new UploadUserAvatarTask(token, uri, context, appCompatActivity);
+        uploadUserAvatarTask.execute();
+//        File file = new File(uri);
+//        RequestBody requestFile = RequestBody.create(MediaType.parse(MimeTypeMap.getSingleton().getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(uri))), file);
+//        MultipartBody.Part body = MultipartBody.Part.createFormData("picture", file.getName(), requestFile);
+//        RequestBody tokenBody = RequestBody.create(okhttp3.MultipartBody.FORM, token);
+//        Call<ResponseBody> call = mHttpEndpointApi.uploadUserAvatar(tokenBody, body);
+//        call.enqueue(new Callback<ResponseBody>() {
+//            @Override
+//            public void onResponse(Call<ResponseBody> call,
+//                                   Response<ResponseBody> response) {
+//                Log.v("Upload", "success");
+//            }
+//
+//            @Override
+//            public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                Log.e("Upload error:", t.getMessage());
+//            }
+//        });
 
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                System.out.println();
-                //TODO add implementation
-            }
-        });
+
+
+//        RequestBody fileBody = RequestBody.create(MediaType.parse("image/jpeg"), file);
+//        RequestBody tokenBody = RequestBody.create(MediaType.parse("text/plain"), token);
+//        Call<ResponseBody> call = mHttpEndpointApi.uploadUserAvatar(tokenBody, fileBody);
+//        call.enqueue(new Callback<ResponseBody>() {
+//            @Override
+//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                System.out.println();
+//                //TODO add implementation
+//            }
+//
+//            @Override
+//            public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                System.out.println();
+//                //TODO add implementation
+//            }
+//        });
     }
 
     @Override
-    public void uploadCarPhoto(String token, String uri) {
+    public void uploadCarPhoto(String token, String carId, String uri) {
         File file = new File(uri);
         RequestBody fileBody = RequestBody.create(MediaType.parse("image/jpeg"), file);
         RequestBody tokenBody = RequestBody.create(MediaType.parse("text/plain"), token);
-        Call<ResponseBody> call = mHttpEndpointApi.uploadCarPhoto(tokenBody, fileBody);
+        RequestBody carIdBody = RequestBody.create(MediaType.parse("text/plain"), carId);
+        Call<ResponseBody> call = mHttpEndpointApi.uploadCarPhoto(tokenBody, carIdBody, fileBody);
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {

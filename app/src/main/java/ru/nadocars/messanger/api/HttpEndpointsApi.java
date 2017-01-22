@@ -1,6 +1,7 @@
 package ru.nadocars.messanger.api;
 
 
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -58,14 +59,20 @@ public interface HttpEndpointsApi {
                                       @Field("car_id") String carId,
                                       @Field("photo_id") String photoId);
 
+//    @Multipart
+//    @POST(HttpApi.UPLOAD_USER_AVATAR)
+//    Call<ResponseBody> uploadUserAvatar(@Part("access_token") RequestBody token,
+//                                        @Part("avatar") RequestBody file);
+
     @Multipart
     @POST(HttpApi.UPLOAD_USER_AVATAR)
     Call<ResponseBody> uploadUserAvatar(@Part("access_token") RequestBody token,
-                                        @Part("avatar") RequestBody file);
+                                        @Part MultipartBody.Part file);
 
     @Multipart
     @POST(HttpApi.UPLOAD_CAR_PHOTO)
     Call<ResponseBody> uploadCarPhoto(@Part("access_token") RequestBody token,
+                                      @Part("car_id") RequestBody carId,
                                       @Part("car_photo") RequestBody file);
 
 }
