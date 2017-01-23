@@ -686,7 +686,20 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
             mEmail = profileInfo.getResponse().getEmail();
             mPhone = profileInfo.getResponse().getPhone();
             mMoneyTextView.setText(String.valueOf(profileInfo.getResponse().getBalance()) + " р.");
-            mNameTextView.setText(profileInfo.getResponse().getLastName() + " " + profileInfo.getResponse().getFirstName() + " " + profileInfo.getResponse().getMiddleName());
+            String fullName = "";
+            String firstName = "";
+            String secondName = "";
+            String thirdName = "";
+            if (null != profileInfo.getResponse().getFirstName() && profileInfo.getResponse().getFirstName().length() > 0) {
+                firstName = profileInfo.getResponse().getFirstName();
+            }
+            if (null != profileInfo.getResponse().getLastName() && profileInfo.getResponse().getLastName().length() > 0) {
+                secondName = profileInfo.getResponse().getLastName();
+            }
+            if (null != profileInfo.getResponse().getMiddleName() && profileInfo.getResponse().getMiddleName().length() > 0) {
+                thirdName = profileInfo.getResponse().getMiddleName();
+            }
+            mNameTextView.setText(secondName + " " + firstName + " " + thirdName);
             mEmailTextView.setText(profileInfo.getResponse().getEmail());
             mPhoneTextView.setText(profileInfo.getResponse().getPhone());
             if (profileInfo.getResponse().getIsOwner() == 1) {
