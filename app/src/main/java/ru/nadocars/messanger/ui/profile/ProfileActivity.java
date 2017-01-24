@@ -611,15 +611,14 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
                 if (requestCode == AVATAR_CAMERA_REQUEST) {
                     bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
 //                    bitmap = rotateBitmap(bitmap, file.getAbsolutePath());
-                    //TODO добавить сохранение пропорции при смене размера изображения
                     bitmap = resizeBitmap(bitmap);
                     mAvatarImageView.setImageBitmap(bitmap);
                     selectedImagePath = saveResizedImage(bitmap, file.getAbsolutePath());
                     if (null != selectedImagePath) {
-                        sendAvatarToServer(selectedImagePath);
+                        sendAvatarToServer(selectedImagePath, true);
                     }
                 } else {
-                    sendCarPhotoToServer(file.getAbsolutePath());
+                    sendCarPhotoToServer(file.getAbsolutePath(), true);
                     addPhotoToList(file.getAbsolutePath());
                 }
             } catch (Exception e) {
@@ -638,15 +637,14 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
                 }
                 bitmap = BitmapFactory.decodeFile(selectedImagePath);
                 if (requestCode == AVATAR_GALLERY_REQUEST) {
-                    //TODO добавить сохранение пропорции при смене размера изображения
                     bitmap = resizeBitmap(bitmap);
                     mAvatarImageView.setImageBitmap(bitmap);
                     selectedImagePath = saveResizedImage(bitmap, selectedImagePath);
                     if (null != selectedImagePath) {
-                        sendAvatarToServer(selectedImagePath);
+                        sendAvatarToServer(selectedImagePath, false);
                     }
                 } else {
-                    sendCarPhotoToServer(selectedImagePath);
+                    sendCarPhotoToServer(selectedImagePath, false);
                     addPhotoToList(selectedImagePath);
                 }
             } else {
@@ -711,12 +709,12 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         }
     }
 
-    private void sendAvatarToServer(String uri) {
-        mProfilePresenter.uploadAvatar(mToken, uri);
+    private void sendAvatarToServer(String uri, boolean shouldRestartActivityOnSuccess) {
+        mProfilePresenter.uploadAvatar(mToken, uri, shouldRestartActivityOnSuccess);
     }
 
-    private void sendCarPhotoToServer(String uri) {
-        mProfilePresenter.uploadCarPhoto(mToken, mCurrentCarId, uri);
+    private void sendCarPhotoToServer(String uri, boolean shouldRestartActivityOnSuccess) {
+        mProfilePresenter.uploadCarPhoto(mToken, mCurrentCarId, uri, shouldRestartActivityOnSuccess);
     }
 
     private void addPhotoToList(String uri) {
@@ -954,6 +952,12 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
                 mViewPager.setCurrentItem(y - 1);
             }
         }
+    }
+
+    @Override
+    public void restartActivity() {
+        startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
+        finish();
     }
 
     private void setCarInfo() {

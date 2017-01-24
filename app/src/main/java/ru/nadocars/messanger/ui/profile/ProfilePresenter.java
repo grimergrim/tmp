@@ -9,8 +9,8 @@ public interface ProfilePresenter extends Presenter<ProfileView> {
     void updateUserInfo(String email, String phoneNumber, String token);
     void updateUserInfo(String email, String phoneNumber, String token, String ssesionId, long code);
     void getCars(String token);
-    void uploadAvatar(String token, String uri);
-    void uploadCarPhoto(String token, String carId, String uri);
+    void uploadAvatar(String token, String uri, boolean restartActivityOnSuccess);
+    void uploadCarPhoto(String token, String carId, String uri, boolean restartActivityOnSuccess);
     void deleteCarPhoto(String token, String carId, String photoId);
     void getCarCalendar(String carId);
     void sendBusyDays(String token, String carId, String dateStart, String timeStart, String dateEnd, String timeEnd);

@@ -1,7 +1,6 @@
 package ru.nadocars.messanger.ui.profile;
 
 import android.support.v4.view.PagerAdapter;
-import android.util.Log;
 import android.webkit.MimeTypeMap;
 
 import com.google.gson.GsonBuilder;
@@ -169,7 +168,7 @@ public class ProfilePresenterImpl implements ProfilePresenter {
     }
 
     @Override
-    public void uploadAvatar(String token, String uri) {
+    public void uploadAvatar(String token, String uri, final boolean restartActivityOnSuccess) {
         File file = new File(uri);
         RequestBody requestFile = RequestBody.create(MediaType.parse(MimeTypeMap.getSingleton()
                 .getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(uri))), file);
@@ -180,18 +179,20 @@ public class ProfilePresenterImpl implements ProfilePresenter {
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                Log.v("Upload", "success");
+                if (restartActivityOnSuccess) {
+                    mProfileView.restartActivity();
+                }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                Log.e("Upload error:", t.getMessage());
+                System.out.println();
             }
         });
     }
 
     @Override
-    public void uploadCarPhoto(final String token, String carId, String uri) {
+    public void uploadCarPhoto(final String token, String carId, String uri, final boolean restartActivityOnSuccess) {
         File file = new File(uri);
         RequestBody requestFile = RequestBody.create(MediaType.parse(MimeTypeMap.getSingleton()
                 .getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(uri))), file);
@@ -204,9 +205,13 @@ public class ProfilePresenterImpl implements ProfilePresenter {
             @Override
             public void onResponse(Call<UploadPhotoResponse> call, Response<UploadPhotoResponse> response) {
                 if (response.isSuccessful() && null != response.body()) {
-                    UploadPhotoResponse uploadPhotoResponse = response.body();
-                    mProfileView.setCarPhotoId(uploadPhotoResponse.getResponse().get(0).getId());
-                    mProfileView.showError("Фото загружено");
+                    if (restartActivityOnSuccess) {
+                        mProfileView.restartActivity();
+                    } else {
+                        UploadPhotoResponse uploadPhotoResponse = response.body();
+                        mProfileView.setCarPhotoId(uploadPhotoResponse.getResponse().get(0).getId());
+                        mProfileView.showError("Фото загружено");
+                    }
                 }
             }
 
