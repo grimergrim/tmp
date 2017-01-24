@@ -765,7 +765,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
 
     @Override
     public void showError(String message) {
-        Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
+        Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
     }
