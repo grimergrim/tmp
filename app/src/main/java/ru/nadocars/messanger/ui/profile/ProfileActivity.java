@@ -120,6 +120,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     private TextView mMonthPriceTitleTextView;
     private Button mExitbutton;
     private Button mGoToWebButton;
+    private Button mBackButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -260,6 +261,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         mMonthPriceTitleTextView = (TextView) findViewById(R.id.month_price_title);
         mGoToWebButton = (Button) findViewById(R.id.go_to_web);
         mExitbutton = (Button) findViewById(R.id.exit_button);
+        mBackButton = (Button) findViewById(R.id.back_button);
     }
 
     private void setListeners() {
@@ -272,6 +274,12 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
                 }
             });
         }
+        mBackButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
         mEmailTextView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -447,8 +455,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
                     mProfilePresenter.updateUserInfo(mEmailTextView.getText().toString(),
                             mPhoneTextView.getText().toString(), token);
                 } else {
-                    Toast.makeText(getApplicationContext(), "Login first please", Toast.LENGTH_SHORT)
-                            .show();
+                    showError("Login first please");
                 }
             }
         });
@@ -604,7 +611,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
                 }
             }
             if (!file.exists()) {
-                Toast.makeText(getBaseContext(), "Error while capturing image", Toast.LENGTH_LONG).show();
+                showError("Error while capturing image");
                 return;
             }
             try {
@@ -649,7 +656,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
                     addPhotoToList(selectedImagePath);
                 }
             } else {
-                Toast.makeText(getApplicationContext(), "Cancelled", Toast.LENGTH_SHORT).show();
+                showError("Cancelled");
             }
         }
     }
