@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -606,34 +608,11 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
             }
             try {
 
-//                int rotate = 0;
-//                try {
-//                    ExifInterface exif = new ExifInterface(file.getAbsolutePath());
-//                    int orientation = exif.getAttributeInt(
-//                            ExifInterface.TAG_ORIENTATION,
-//                            ExifInterface.ORIENTATION_NORMAL);
-//                    switch (orientation) {
-//                        case ExifInterface.ORIENTATION_ROTATE_270:
-//                            rotate = 270;
-//                            break;
-//                        case ExifInterface.ORIENTATION_ROTATE_180:
-//                            rotate = 180;
-//                            break;
-//                        case ExifInterface.ORIENTATION_ROTATE_90:
-//                            rotate = 90;
-//                            break;
-//                    }
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//                Matrix matrix = new Matrix();
-//                matrix.postRotate(rotate);
-//                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
                 if (requestCode == AVATAR_CAMERA_REQUEST) {
                     bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
+//                    bitmap = rotateBitmap(bitmap, file.getAbsolutePath());
                     //TODO добавить сохранение пропорции при смене размера изображения
-                    //TODO добавить разворот
-                    bitmap = Bitmap.createScaledBitmap(bitmap, 400, 400, true);
+                    bitmap = resizeBitmap(bitmap);
                     mAvatarImageView.setImageBitmap(bitmap);
                     selectedImagePath = saveResizedImage(bitmap, file.getAbsolutePath());
                     if (null != selectedImagePath) {
@@ -660,8 +639,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
                 bitmap = BitmapFactory.decodeFile(selectedImagePath);
                 if (requestCode == AVATAR_GALLERY_REQUEST) {
                     //TODO добавить сохранение пропорции при смене размера изображения
-                    //TODO добавить разворот
-                    bitmap = Bitmap.createScaledBitmap(bitmap, 400, 400, false);
+                    bitmap = resizeBitmap(bitmap);
                     mAvatarImageView.setImageBitmap(bitmap);
                     selectedImagePath = saveResizedImage(bitmap, selectedImagePath);
                     if (null != selectedImagePath) {
@@ -675,6 +653,42 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
                 Toast.makeText(getApplicationContext(), "Cancelled", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private Bitmap resizeBitmap(Bitmap bitmap) {
+        float ratio = Math.min(
+                (float) 2000 / bitmap.getWidth(),
+                (float) 2000 / bitmap.getHeight());
+        int width = Math.round((float) ratio * bitmap.getWidth());
+        int height = Math.round((float) ratio * bitmap.getHeight());
+        return Bitmap.createScaledBitmap(bitmap, width, height, false);
+    }
+
+    private Bitmap rotateBitmap(Bitmap bitmap, String path) {
+        int rotate = 0;
+        try {
+            ExifInterface exif = new ExifInterface(path);
+            int orientation = exif.getAttributeInt(
+                    ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_NORMAL);
+            switch (orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    rotate = 270;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    rotate = 180;
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    rotate = 90;
+                    break;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Matrix matrix = new Matrix();
+        matrix.postRotate(rotate);
+        bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+        return bitmap;
     }
 
     private String saveResizedImage(Bitmap bitmap, String selectedImagePath) {
