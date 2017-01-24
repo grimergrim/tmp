@@ -57,13 +57,17 @@ public class ProfilePresenterImpl implements ProfilePresenter {
             @Override
             public void onResponse(Call<GetUserResponse> call, Response<GetUserResponse> response) {
                 if (null != response && response.isSuccessful()) {
-                    mProfileView.setProfileInfo(response.body());
+                    if (null != mProfileView) {
+                        mProfileView.setProfileInfo(response.body());
+                    }
                 }
             }
 
             @Override
             public void onFailure(Call<GetUserResponse> call, Throwable t) {
-                mProfileView.showError("Ошибка сервера");
+                if (null != mProfileView) {
+                    mProfileView.showError("Ошибка сервера");
+                }
             }
         });
     }
@@ -80,31 +84,41 @@ public class ProfilePresenterImpl implements ProfilePresenter {
                             .toJsonTree(response.body()).getAsJsonObject();
                     UserUpdateError104 userUpdateError104 = new GsonBuilder().create()
                             .fromJson(jsonObject.toString(), UserUpdateError104.class);
-                    mProfileView.requestVerificationCode(email, phoneNumber, token,
-                            userUpdateError104.getError().getErrorDetail().getCode(),
-                            userUpdateError104.getError()
-                                    .getErrorDetail().getSessionId());
+                    if (null != mProfileView) {
+                        mProfileView.requestVerificationCode(email, phoneNumber, token,
+                                userUpdateError104.getError().getErrorDetail().getCode(),
+                                userUpdateError104.getError()
+                                        .getErrorDetail().getSessionId());
+                    }
                 } else if (response.body().toString().contains("103")) {
                     JsonObject jsonObject = new GsonBuilder().create()
                             .toJsonTree(response.body()).getAsJsonObject();
                     UserUpdateError103 userUpdateError103 = new GsonBuilder().create()
                             .fromJson(jsonObject.toString(), UserUpdateError103.class);
-                    mProfileView.showError(userUpdateError103.getError().getErrorMsg());
+                    if (null != mProfileView) {
+                        mProfileView.showError(userUpdateError103.getError().getErrorMsg());
+                    }
                 } else if (response.body().toString().contains("102")) {
                     JsonObject jsonObject = new GsonBuilder().create()
                             .toJsonTree(response.body()).getAsJsonObject();
                     UserUpdateError102 userUpdateError102 = new GsonBuilder().create()
                             .fromJson(jsonObject.toString(), UserUpdateError102.class);
-                    mProfileView.showError(userUpdateError102.getError().getErrorMsg());
+                    if (null != mProfileView) {
+                        mProfileView.showError(userUpdateError102.getError().getErrorMsg());
+                    }
                 } else if (response.body().toString().equals("1.0")) {
-                    mProfileView.hideUpdateButton();
-                    mProfileView.showError("Данные успешно обновлены");
+                    if (null != mProfileView) {
+                        mProfileView.hideUpdateButton();
+                        mProfileView.showError("Данные успешно обновлены");
+                    }
                 }
             }
 
             @Override
             public void onFailure(Call<Object> call, Throwable t) {
-                mProfileView.showError("Ошибка сервера");
+                if (null != mProfileView) {
+                    mProfileView.showError("Ошибка сервера");
+                }
             }
         });
     }
@@ -122,28 +136,38 @@ public class ProfilePresenterImpl implements ProfilePresenter {
                             .toJsonTree(response.body()).getAsJsonObject();
                     UserUpdateError104 userUpdateError104 = new GsonBuilder().create()
                             .fromJson(jsonObject.toString(), UserUpdateError104.class);
-                    mProfileView.showError(userUpdateError104.getError().getErrorMsg());
+                    if (null != mProfileView) {
+                        mProfileView.showError(userUpdateError104.getError().getErrorMsg());
+                    }
                 } else if (response.body().toString().contains("103")) {
                     JsonObject jsonObject = new GsonBuilder().create()
                             .toJsonTree(response.body()).getAsJsonObject();
                     UserUpdateError103 userUpdateError103 = new GsonBuilder().create()
                             .fromJson(jsonObject.toString(), UserUpdateError103.class);
-                    mProfileView.showError(userUpdateError103.getError().getErrorMsg());
+                    if (null != mProfileView) {
+                        mProfileView.showError(userUpdateError103.getError().getErrorMsg());
+                    }
                 } else if (response.body().toString().contains("102")) {
                     JsonObject jsonObject = new GsonBuilder().create()
                             .toJsonTree(response.body()).getAsJsonObject();
                     UserUpdateError102 userUpdateError102 = new GsonBuilder().create()
                             .fromJson(jsonObject.toString(), UserUpdateError102.class);
-                    mProfileView.showError(userUpdateError102.getError().getErrorMsg());
+                    if (null != mProfileView) {
+                        mProfileView.showError(userUpdateError102.getError().getErrorMsg());
+                    }
                 } else if (response.body().toString().equals("1.0")) {
-                    mProfileView.hideCodeLayout();
-                    mProfileView.showError("Обновление успешно");
+                    if (null != mProfileView) {
+                        mProfileView.hideCodeLayout();
+                        mProfileView.showError("Обновление успешно");
+                    }
                 }
             }
 
             @Override
             public void onFailure(Call<Object> call, Throwable t) {
-                mProfileView.showError("Ошибка сервера");
+                if (null != mProfileView) {
+                    mProfileView.showError("Ошибка сервера");
+                }
             }
         });
     }
@@ -155,14 +179,18 @@ public class ProfilePresenterImpl implements ProfilePresenter {
             @Override
             public void onResponse(Call<GetCarsResponse> call, Response<GetCarsResponse> response) {
                 if (response.isSuccessful()) {
-                    mGetCarsResponse = response.body();
-                    mProfileView.setCarsInfo();
+                    if (null != mProfileView) {
+                        mGetCarsResponse = response.body();
+                        mProfileView.setCarsInfo();
+                    }
                 }
             }
 
             @Override
             public void onFailure(Call<GetCarsResponse> call, Throwable t) {
-                mProfileView.showError("Ошибка соединения с сервером");
+                if (null != mProfileView) {
+                    mProfileView.showError("Ошибка соединения с сервером");
+                }
             }
         });
     }
@@ -180,7 +208,9 @@ public class ProfilePresenterImpl implements ProfilePresenter {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (restartActivityOnSuccess) {
-                    mProfileView.restartActivity();
+                    if (null != mProfileView) {
+                        mProfileView.restartActivity();
+                    }
                 }
             }
 
@@ -206,18 +236,24 @@ public class ProfilePresenterImpl implements ProfilePresenter {
             public void onResponse(Call<UploadPhotoResponse> call, Response<UploadPhotoResponse> response) {
                 if (response.isSuccessful() && null != response.body()) {
                     if (restartActivityOnSuccess) {
-                        mProfileView.restartActivity();
+                        if (null != mProfileView) {
+                            mProfileView.restartActivity();
+                        }
                     } else {
-                        UploadPhotoResponse uploadPhotoResponse = response.body();
-                        mProfileView.setCarPhotoId(uploadPhotoResponse.getResponse().get(0).getId());
-                        mProfileView.showError("Фото загружено");
+                        if (null != mProfileView) {
+                            UploadPhotoResponse uploadPhotoResponse = response.body();
+                            mProfileView.setCarPhotoId(uploadPhotoResponse.getResponse().get(0).getId());
+                            mProfileView.showError("Фото загружено");
+                        }
                     }
                 }
             }
 
             @Override
             public void onFailure(Call<UploadPhotoResponse> call, Throwable t) {
-                mProfileView.showError("Ошибка сервера");
+                if (null != mProfileView) {
+                    mProfileView.showError("Ошибка сервера");
+                }
             }
         });
     }
@@ -230,14 +266,18 @@ public class ProfilePresenterImpl implements ProfilePresenter {
             public void onResponse(Call<Object> call, Response<Object> response) {
                 if (null != response && response.isSuccessful()) {
                     response.body().toString().equals("1.0");
-                    mProfileView.deletePhotoFromViewPager(carId, photoId);
-                    mProfileView.showError("Фото удалено");
+                    if (null != mProfileView) {
+                        mProfileView.deletePhotoFromViewPager(carId, photoId);
+                        mProfileView.showError("Фото удалено");
+                    }
                 }
             }
 
             @Override
             public void onFailure(Call<Object> call, Throwable t) {
-                mProfileView.showError("Ошибка сервера");
+                if (null != mProfileView) {
+                    mProfileView.showError("Ошибка сервера");
+                }
             }
         });
     }
@@ -248,16 +288,18 @@ public class ProfilePresenterImpl implements ProfilePresenter {
         carCalendarCall.enqueue(new Callback<GetCarCalendarResponse>() {
             @Override
             public void onResponse(Call<GetCarCalendarResponse> call, Response<GetCarCalendarResponse> response) {
-                if (response.isSuccessful()) {
+                if (response.isSuccessful() && null != mProfileView) {
                     mProfileView.setBusyDays(response.body());
-                } else {
+                } else if (null != mProfileView){
                     mProfileView.showError("Ошибка сервера");
                 }
             }
 
             @Override
             public void onFailure(Call<GetCarCalendarResponse> call, Throwable t) {
-                mProfileView.showError("Ошибка сервера");
+                if (null != mProfileView) {
+                    mProfileView.showError("Ошибка сервера");
+                }
             }
         });
     }
@@ -287,13 +329,17 @@ public class ProfilePresenterImpl implements ProfilePresenter {
         updateCarPrice.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                mProfileView.updatePriceStatus(type);
-                mProfileView.showError("Цена обновлена");
+                if (null != mProfileView) {
+                    mProfileView.updatePriceStatus(type);
+                    mProfileView.showError("Цена обновлена");
+                }
             }
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-                mProfileView.showError("Цена не обновлена");
+                if (null != mProfileView) {
+                    mProfileView.showError("Цена не обновлена");
+                }
             }
         });
     }
