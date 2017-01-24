@@ -37,6 +37,8 @@ import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -603,8 +605,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
                 return;
             }
             try {
-                bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
-                bitmap = Bitmap.createScaledBitmap(bitmap, 400, 400, true);
+
 //                int rotate = 0;
 //                try {
 //                    ExifInterface exif = new ExifInterface(file.getAbsolutePath());
@@ -629,8 +630,15 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
 //                matrix.postRotate(rotate);
 //                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
                 if (requestCode == AVATAR_CAMERA_REQUEST) {
+                    bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
+                    //TODO добавить сохранение пропорции при смене размера изображения
+                    //TODO добавить разворот
+                    bitmap = Bitmap.createScaledBitmap(bitmap, 400, 400, true);
                     mAvatarImageView.setImageBitmap(bitmap);
-                    sendAvatarToServer(file.getAbsolutePath());
+                    selectedImagePath = saveResizedImage(bitmap, file.getAbsolutePath());
+                    if (null != selectedImagePath) {
+                        sendAvatarToServer(selectedImagePath);
+                    }
                 } else {
                     sendCarPhotoToServer(file.getAbsolutePath());
                     addPhotoToList(file.getAbsolutePath());
@@ -638,7 +646,6 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         } else if (resultCode == RESULT_OK && requestCode == AVATAR_GALLERY_REQUEST
                 || resultCode == RESULT_OK && requestCode == CAR_GALLERY_REQUEST) {
             if (data != null) {
@@ -652,15 +659,40 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
                 }
                 bitmap = BitmapFactory.decodeFile(selectedImagePath);
                 if (requestCode == AVATAR_GALLERY_REQUEST) {
+                    //TODO добавить сохранение пропорции при смене размера изображения
+                    //TODO добавить разворот
                     bitmap = Bitmap.createScaledBitmap(bitmap, 400, 400, false);
                     mAvatarImageView.setImageBitmap(bitmap);
-                    sendAvatarToServer(selectedImagePath);
+                    selectedImagePath = saveResizedImage(bitmap, selectedImagePath);
+                    if (null != selectedImagePath) {
+                        sendAvatarToServer(selectedImagePath);
+                    }
                 } else {
                     sendCarPhotoToServer(selectedImagePath);
                     addPhotoToList(selectedImagePath);
                 }
             } else {
                 Toast.makeText(getApplicationContext(), "Cancelled", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private String saveResizedImage(Bitmap bitmap, String selectedImagePath) {
+        FileOutputStream out = null;
+        try {
+            out = new FileOutputStream(selectedImagePath);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+            return selectedImagePath;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            try {
+                if (out != null) {
+                    out.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
