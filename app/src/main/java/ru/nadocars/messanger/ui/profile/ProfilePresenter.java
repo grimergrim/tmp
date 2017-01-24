@@ -1,5 +1,6 @@
 package ru.nadocars.messanger.ui.profile;
 
+import ru.nadocars.messanger.json.car.GetCarsResponse;
 import ru.nadocars.messanger.ui.Presenter;
 
 public interface ProfilePresenter extends Presenter<ProfileView> {
@@ -14,5 +15,6 @@ public interface ProfilePresenter extends Presenter<ProfileView> {
     void getCarCalendar(String carId);
     void sendBusyDays(String token, String carId, String dateStart, String timeStart, String dateEnd, String timeEnd);
     void updateCarPrice(String token, String carId, String type, String price);
+    GetCarsResponse getGetCarsResponse();
 
 }

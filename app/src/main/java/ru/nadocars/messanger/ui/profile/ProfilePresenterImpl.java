@@ -1,5 +1,6 @@
 package ru.nadocars.messanger.ui.profile;
 
+import android.support.v4.view.PagerAdapter;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
@@ -30,6 +31,8 @@ public class ProfilePresenterImpl implements ProfilePresenter {
     private static ProfilePresenterImpl profilePresenter = new ProfilePresenterImpl();
     private ProfileView mProfileView;
     private HttpEndpointsApi mHttpEndpointApi;
+    private GetCarsResponse mGetCarsResponse;
+    private PagerAdapter mPagerAdapter;
 
     private ProfilePresenterImpl() {
         mHttpEndpointApi = RetrofitFactory.getHttpEndpointApi();
@@ -42,6 +45,10 @@ public class ProfilePresenterImpl implements ProfilePresenter {
     @Override
     public void setView(ProfileView view) {
         mProfileView = view;
+    }
+
+    public GetCarsResponse getGetCarsResponse() {
+        return mGetCarsResponse;
     }
 
     @Override
@@ -149,7 +156,8 @@ public class ProfilePresenterImpl implements ProfilePresenter {
             @Override
             public void onResponse(Call<GetCarsResponse> call, Response<GetCarsResponse> response) {
                 if (response.isSuccessful()) {
-                    mProfileView.setCarsInfo(response.body());
+                    mGetCarsResponse = response.body();
+                    mProfileView.setCarsInfo();
                 }
             }
 
@@ -183,7 +191,7 @@ public class ProfilePresenterImpl implements ProfilePresenter {
     }
 
     @Override
-    public void uploadCarPhoto(String token, String carId, String uri) {
+    public void uploadCarPhoto(final String token, String carId, String uri) {
         File file = new File(uri);
         RequestBody requestFile = RequestBody.create(MediaType.parse(MimeTypeMap.getSingleton()
                 .getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(uri))), file);

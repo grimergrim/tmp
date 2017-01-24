@@ -6,17 +6,12 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.constraint.ConstraintLayout;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -51,11 +46,11 @@ import java.util.List;
 import java.util.Locale;
 
 import ru.nadocars.messanger.R;
+import ru.nadocars.messanger.api.BundleApi;
 import ru.nadocars.messanger.api.SharedPreferencesApi;
 import ru.nadocars.messanger.asynctasks.LogOutTask;
 import ru.nadocars.messanger.data.repo.ContactsRepo;
 import ru.nadocars.messanger.data.repo.MessagesRepo;
-import ru.nadocars.messanger.json.car.GetCarsResponse;
 import ru.nadocars.messanger.json.car.Item;
 import ru.nadocars.messanger.json.car.Photo;
 import ru.nadocars.messanger.json.car.calendar.GetCarCalendarResponse;
@@ -74,8 +69,21 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
 
     private ProfilePresenter mProfilePresenter;
     private Navigator mNavigator;
+
     private ViewPager mViewPager;
-    private PagerAdapter mPagerAdapter;
+    private long mVerificationCode;
+    private int mCarCounter;
+    private String mCurrentCarId;
+    private String mEmail;
+    private String mPhone;
+    private String mDayPrice;
+    private String mWeekPrice;
+    private String mMonthPrice;
+    private String mSessionId;
+    private String mToken;
+
+    private Calendar mToDateCalendar;
+    private Calendar mFromDateCalendar;
     private TextView mNameTextView;
     private TextView mMoneyTextView;
     private EditText mEmailTextView;
@@ -88,12 +96,6 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     private LinearLayout mCodeLinearLayout;
     private EditText mCodeEditText;
     private Button mSaveButton;
-    private String mEmail;
-    private String mPhone;
-    private String mDayPrice;
-    private String mWeekPrice;
-    private String mMonthPrice;
-    private String mSessionId;
     private TextView mCarTitleEditText;
     private Button mAddPhotoButton;
     private Button mDeletePhotoButton;
@@ -111,37 +113,27 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     private TextView mWeekPriceTitleTextView;
     private EditText mMonthPriceEditText;
     private TextView mMonthPriceTitleTextView;
+    private Button mExitbutton;
     private Button mGoToWebButton;
-    private Bitmap bitmap;
-    private String selectedImagePath;
-    private String mImagePath;
-    private String mToken;
-    private GetCarsResponse mGetCarsResponse;
-    private Calendar mToDateCalendar;
-    private Calendar mFromDateCalendar;
-    private long mVerificationCode;
-    private int mCarCounter;
-    private String mCurrentCarId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mProfilePresenter = ProfilePresenterImpl.getPreLoginPresenter();
         mProfilePresenter.setView(this);
+        mNavigator = new NavigatorImpl();
         mCarCounter = 0;
         mToDateCalendar = Calendar.getInstance();
         mFromDateCalendar = Calendar.getInstance();
+        mToken = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+                .getString(SharedPreferencesApi.TOKEN, null);
         setContentView(R.layout.activity_profile);
         findViews();
         setListeners();
         initializeSpinners();
-        if (mCarsConstraintLayout != null)
+        if (mCarsConstraintLayout != null) {
             mCarsConstraintLayout.setVisibility(View.GONE);
-        Button exitbutton = (Button) findViewById(R.id.exit_button);
-        Button settingsButton = (Button) findViewById(R.id.check_interval);
-        mNavigator = new NavigatorImpl();
-        mToken = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
-                .getString(SharedPreferencesApi.TOKEN, null);
+        }
         if (null != mToken) {
             mProfilePresenter.getUserInfo(mToken);
             mProfilePresenter.getCars(mToken);
@@ -149,7 +141,6 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         if (null != mUserAvatar) {
             mUserAvatar.setVisibility(View.GONE);
         }
-//        initCalendar();
         if (null != mEmailTextView) {
             mEmailTextView.setFocusable(false);
 
@@ -169,34 +160,50 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         if (null != mCodeLinearLayout) {
             mCodeLinearLayout.setVisibility(View.GONE);
         }
-        if (settingsButton != null) {
-            settingsButton.setVisibility(View.GONE);
-            settingsButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-//                    openSettings();
-                }
-            });
-        }
-        if (exitbutton != null) {
-            exitbutton.setVisibility(View.VISIBLE);
-            exitbutton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    logOut();
-                }
-            });
-        }
     }
 
-//    //открыть настройки
-//    private void openSettings() {
-//        IntervalDialogFragment intervalDialogFragment;
-//        intervalDialogFragment = new IntervalDialogFragment();
-//        intervalDialogFragment.show(getFragmentManager(), "SetIntervalDialog");
-//    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
 
-    //логаут
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong(BundleApi.VERIFICATION_CODE, mVerificationCode);
+        outState.putInt(BundleApi.CAR_COUNTER, mCarCounter);
+        outState.putString(BundleApi.CURRENT_CAR_ID, mCurrentCarId);
+        outState.putString(BundleApi.EMAIL, mEmail);
+        outState.putString(BundleApi.PHONE, mPhone);
+        outState.putString(BundleApi.DAY_PRICE, mDayPrice);
+        outState.putString(BundleApi.WEEK_PRICE, mWeekPrice);
+        outState.putString(BundleApi.MONTH_PRICE, mMonthPrice);
+        outState.putString(BundleApi.SESSION_ID, mSessionId);
+        outState.putString(BundleApi.TOKEN, mToken);
+
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mVerificationCode = savedInstanceState.getLong(BundleApi.VERIFICATION_CODE);
+        mCarCounter = savedInstanceState.getInt(BundleApi.CAR_COUNTER);
+        mCurrentCarId = savedInstanceState.getString(BundleApi.CURRENT_CAR_ID);
+        mEmail = savedInstanceState.getString(BundleApi.EMAIL);
+        mPhone = savedInstanceState.getString(BundleApi.PHONE);
+        mDayPrice = savedInstanceState.getString(BundleApi.DAY_PRICE);
+        mWeekPrice = savedInstanceState.getString(BundleApi.WEEK_PRICE);
+        mMonthPrice = savedInstanceState.getString(BundleApi.MONTH_PRICE);
+        mSessionId = savedInstanceState.getString(BundleApi.SESSION_ID);
+        mToken = savedInstanceState.getString(BundleApi.TOKEN);
+
+    }
+
     private void logOut() {
         SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         LogOutTask logOutTask = new LogOutTask(this, defaultSharedPreferences.getString(SharedPreferencesApi.TOKEN, null));
@@ -247,9 +254,19 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         mMonthPriceEditText = (EditText) findViewById(R.id.month_price);
         mMonthPriceTitleTextView = (TextView) findViewById(R.id.month_price_title);
         mGoToWebButton = (Button) findViewById(R.id.go_to_web);
+        mExitbutton = (Button) findViewById(R.id.exit_button);
     }
 
     private void setListeners() {
+        if (mExitbutton != null) {
+            mExitbutton.setVisibility(View.VISIBLE);
+            mExitbutton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    logOut();
+                }
+            });
+        }
         mEmailTextView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -295,7 +312,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (!mPhone.equals(s)) {
+                if (null != mPhone && !mPhone.equals(s)) {
                     mUpdateButton.setVisibility(View.VISIBLE);
                 }
             }
@@ -456,7 +473,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
             @Override
             public void onClick(View v) {
                 mProfilePresenter.deleteCarPhoto(mToken, mCurrentCarId,
-                        mGetCarsResponse.getResponse().getItems().get(mCarCounter - 1).getPhotos()
+                        mProfilePresenter.getGetCarsResponse().getResponse().getItems().get(mCarCounter - 1).getPhotos()
                                 .get(mViewPager.getCurrentItem()).getId());
             }
         });
@@ -570,8 +587,8 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        bitmap = null;
-        selectedImagePath = null;
+        Bitmap bitmap;
+        String selectedImagePath = null;
         if (resultCode == RESULT_OK && requestCode == AVATAR_CAMERA_REQUEST
                 || resultCode == RESULT_OK && requestCode == CAR_CAMERA_REQUEST) {
             File file = new File(Environment.getExternalStorageDirectory().toString());
@@ -587,38 +604,36 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
             }
             try {
                 bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
-                if (requestCode == AVATAR_CAMERA_REQUEST) {
-                    bitmap = Bitmap.createScaledBitmap(bitmap, 400, 400, true);
-                }
-                int rotate = 0;
-                try {
-                    ExifInterface exif = new ExifInterface(file.getAbsolutePath());
-                    int orientation = exif.getAttributeInt(
-                            ExifInterface.TAG_ORIENTATION,
-                            ExifInterface.ORIENTATION_NORMAL);
-                    switch (orientation) {
-                        case ExifInterface.ORIENTATION_ROTATE_270:
-                            rotate = 270;
-                            break;
-                        case ExifInterface.ORIENTATION_ROTATE_180:
-                            rotate = 180;
-                            break;
-                        case ExifInterface.ORIENTATION_ROTATE_90:
-                            rotate = 90;
-                            break;
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                Matrix matrix = new Matrix();
-                matrix.postRotate(rotate);
-                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                bitmap = Bitmap.createScaledBitmap(bitmap, 400, 400, true);
+//                int rotate = 0;
+//                try {
+//                    ExifInterface exif = new ExifInterface(file.getAbsolutePath());
+//                    int orientation = exif.getAttributeInt(
+//                            ExifInterface.TAG_ORIENTATION,
+//                            ExifInterface.ORIENTATION_NORMAL);
+//                    switch (orientation) {
+//                        case ExifInterface.ORIENTATION_ROTATE_270:
+//                            rotate = 270;
+//                            break;
+//                        case ExifInterface.ORIENTATION_ROTATE_180:
+//                            rotate = 180;
+//                            break;
+//                        case ExifInterface.ORIENTATION_ROTATE_90:
+//                            rotate = 90;
+//                            break;
+//                    }
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//                Matrix matrix = new Matrix();
+//                matrix.postRotate(rotate);
+//                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
                 if (requestCode == AVATAR_CAMERA_REQUEST) {
                     mAvatarImageView.setImageBitmap(bitmap);
                     sendAvatarToServer(file.getAbsolutePath());
-                } else if (requestCode == CAR_CAMERA_REQUEST) {
-                    addPhotoToList(file.getAbsolutePath());
+                } else {
                     sendCarPhotoToServer(file.getAbsolutePath());
+                    addPhotoToList(file.getAbsolutePath());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -640,9 +655,9 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
                     bitmap = Bitmap.createScaledBitmap(bitmap, 400, 400, false);
                     mAvatarImageView.setImageBitmap(bitmap);
                     sendAvatarToServer(selectedImagePath);
-                } else if (requestCode == CAR_GALLERY_REQUEST) {
-                    addPhotoToList(selectedImagePath);
+                } else {
                     sendCarPhotoToServer(selectedImagePath);
+                    addPhotoToList(selectedImagePath);
                 }
             } else {
                 Toast.makeText(getApplicationContext(), "Cancelled", Toast.LENGTH_SHORT).show();
@@ -669,15 +684,6 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     protected void onDestroy() {
         super.onDestroy();
         mProfilePresenter.setView(null);
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (mViewPager.getCurrentItem() == 0) {
-            super.onBackPressed();
-        } else {
-            mViewPager.setCurrentItem(mViewPager.getCurrentItem() - 1);
-        }
     }
 
     @Override
@@ -737,8 +743,8 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     }
 
     @Override
-    public void setCarsInfo(GetCarsResponse carsInfo) {
-        mGetCarsResponse = carsInfo;
+    public void setCarsInfo() {
+//        mGetCarsResponse = carsInfo;
         setCarInfo();
     }
 
@@ -850,12 +856,16 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
 
     @Override
     public void updatePriceStatus(String viewName) {
-        if (viewName.equals("day")) {
-            mDayPriceTitleTextView.setText("в день");
-        } else if (viewName.equals("week")) {
-            mWeekPriceTitleTextView.setText("в неделю");
-        } else if (viewName.equals("month")) {
-            mMonthPriceTitleTextView.setText("в месяц");
+        switch (viewName) {
+            case "day":
+                mDayPriceTitleTextView.setText("в день");
+                break;
+            case "week":
+                mWeekPriceTitleTextView.setText("в неделю");
+                break;
+            case "month":
+                mMonthPriceTitleTextView.setText("в месяц");
+                break;
         }
     }
 
@@ -863,16 +873,16 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     public void setCarPhotoId(String photoId) {
         Photo photo = new Photo();
         photo.setId(photoId);
-        List<Photo> photos = mGetCarsResponse.getResponse().getItems().get(mCarCounter - 1).getPhotos();
+        List<Photo> photos = mProfilePresenter.getGetCarsResponse().getResponse().getItems().get(mCarCounter - 1).getPhotos();
         photos.add(photo);
-        mGetCarsResponse.getResponse().getItems().get(mCarCounter - 1).setPhotos(photos);
+        mProfilePresenter.getGetCarsResponse().getResponse().getItems().get(mCarCounter - 1).setPhotos(photos);
         System.out.println();
     }
 
     @Override
     public void deletePhotoFromViewPager(String carId, String photoId) {
         int y = -1;
-        for (Item item : mGetCarsResponse.getResponse().getItems()) {
+        for (Item item : mProfilePresenter.getGetCarsResponse().getResponse().getItems()) {
             if (item.getId().equals(carId)) {
                 List<Photo> photos = new ArrayList<>();
                 for (int i = 0; i < item.getPhotos().size(); i++) {
@@ -898,12 +908,11 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
                 mViewPager.setCurrentItem(y - 1);
             }
         }
-
     }
 
     private void setCarInfo() {
-        mCurrentCarId = mGetCarsResponse.getResponse().getItems().get(mCarCounter).getId();
-        Item car = mGetCarsResponse.getResponse().getItems().get(mCarCounter);
+        mCurrentCarId = mProfilePresenter.getGetCarsResponse().getResponse().getItems().get(mCarCounter).getId();
+        Item car = mProfilePresenter.getGetCarsResponse().getResponse().getItems().get(mCarCounter);
         mProfilePresenter.getCarCalendar(car.getId());
         String carName = car.getMark() + " " + car.getModel() + " " + car.getYear();
         mCarTitleEditText.setText(carName);
@@ -917,45 +926,12 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         for (Photo photo : car.getPhotos()) {
             photoUrls.add(photo.getImage600x360());
         }
-        mPagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager(), photoUrls);
-        mViewPager.setAdapter(mPagerAdapter);
-        if (mCarCounter < mGetCarsResponse.getResponse().getItems().size() - 1) {
+        PagerAdapter pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager(), photoUrls);
+        mViewPager.setAdapter(pagerAdapter);
+        if (mCarCounter < mProfilePresenter.getGetCarsResponse().getResponse().getItems().size() - 1) {
             mCarCounter++;
         } else {
             mCarCounter = 0;
-        }
-    }
-
-    private class ScreenSlidePagerAdapter extends FragmentStatePagerAdapter {
-
-        private List<String> mPhotoList;
-
-        public ScreenSlidePagerAdapter(FragmentManager fragmentManager, List<String> photos) {
-            super(fragmentManager);
-            mPhotoList = photos;
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            Bundle bundle = new Bundle();
-            bundle.putString("url", mPhotoList.get(position));
-            ScreenSlidePageFragment screenSlidePageFragment = new ScreenSlidePageFragment();
-            screenSlidePageFragment.setArguments(bundle);
-            return screenSlidePageFragment;
-        }
-
-        @Override
-        public int getCount() {
-            return mPhotoList.size();
-        }
-
-        public List<String> getPhotoList() {
-            return mPhotoList;
-        }
-
-        public void setPhotoList(List<String> photoList) {
-            mPhotoList = photoList;
-            notifyDataSetChanged();
         }
     }
 
