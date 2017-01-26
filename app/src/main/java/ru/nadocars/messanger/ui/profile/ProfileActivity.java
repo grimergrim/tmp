@@ -484,9 +484,16 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         mDeletePhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mProfilePresenter.deleteCarPhoto(mToken, mCurrentCarId,
-                        mProfilePresenter.getGetCarsResponse().getResponse().getItems().get(mCarCounter - 1).getPhotos()
-                                .get(mViewPager.getCurrentItem()).getId());
+                if (null != mProfilePresenter.getGetCarsResponse()
+                        && null != mProfilePresenter.getGetCarsResponse().getResponse()
+                        && null != mProfilePresenter.getGetCarsResponse().getResponse().getItems()
+                        && mProfilePresenter.getGetCarsResponse().getResponse().getItems().size() > 0
+                        && mProfilePresenter.getGetCarsResponse().getResponse().getItems()
+                        .get(mCarCounter).getPhotos().size() > 0) {
+                    mProfilePresenter.deleteCarPhoto(mToken, mCurrentCarId,
+                            mProfilePresenter.getGetCarsResponse().getResponse().getItems().get(mCarCounter).getPhotos()
+                                    .get(mViewPager.getCurrentItem()).getId());
+                }
             }
         });
         mNextCarButton.setOnClickListener(new View.OnClickListener() {
@@ -927,9 +934,9 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     public void setCarPhotoId(String photoId) {
         Photo photo = new Photo();
         photo.setId(photoId);
-        List<Photo> photos = mProfilePresenter.getGetCarsResponse().getResponse().getItems().get(mCarCounter - 1).getPhotos();
+        List<Photo> photos = mProfilePresenter.getGetCarsResponse().getResponse().getItems().get(mCarCounter).getPhotos();
         photos.add(photo);
-        mProfilePresenter.getGetCarsResponse().getResponse().getItems().get(mCarCounter - 1).setPhotos(photos);
+        mProfilePresenter.getGetCarsResponse().getResponse().getItems().get(mCarCounter).setPhotos(photos);
         System.out.println();
     }
 
@@ -971,27 +978,32 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     }
 
     private void setCarInfo() {
-        mCurrentCarId = mProfilePresenter.getGetCarsResponse().getResponse().getItems().get(mCarCounter).getId();
-        Item car = mProfilePresenter.getGetCarsResponse().getResponse().getItems().get(mCarCounter);
-        mProfilePresenter.getCarCalendar(car.getId());
-        String carName = car.getMark() + " " + car.getModel() + " " + car.getYear();
-        mCarTitleEditText.setText(carName);
-        mDayPriceEditText.setText(String.valueOf(car.getDayPrice()));
-        mWeekPriceEditText.setText(String.valueOf(car.getWeekPrice()));
-        mMonthPriceEditText.setText(String.valueOf(car.getMonthPrice()));
-        mDayPrice = String.valueOf(car.getDayPrice());
-        mWeekPrice = String.valueOf(car.getWeekPrice());
-        mMonthPrice = String.valueOf(car.getMonthPrice());
-        List<String> photoUrls = new ArrayList<>();
-        for (Photo photo : car.getPhotos()) {
-            photoUrls.add(photo.getImage600x360());
-        }
-        PagerAdapter pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager(), photoUrls);
-        mViewPager.setAdapter(pagerAdapter);
-        if (mCarCounter < mProfilePresenter.getGetCarsResponse().getResponse().getItems().size() - 1) {
-            mCarCounter++;
-        } else {
-            mCarCounter = 0;
+        if (null != mProfilePresenter.getGetCarsResponse()
+                && null != mProfilePresenter.getGetCarsResponse().getResponse()
+                && null != mProfilePresenter.getGetCarsResponse().getResponse().getItems()
+                && mProfilePresenter.getGetCarsResponse().getResponse().getItems().size() > 0) {
+            mCurrentCarId = mProfilePresenter.getGetCarsResponse().getResponse().getItems().get(mCarCounter).getId();
+            Item car = mProfilePresenter.getGetCarsResponse().getResponse().getItems().get(mCarCounter);
+            mProfilePresenter.getCarCalendar(car.getId());
+            String carName = car.getMark() + " " + car.getModel() + " " + car.getYear();
+            mCarTitleEditText.setText(carName);
+            mDayPriceEditText.setText(String.valueOf(car.getDayPrice()));
+            mWeekPriceEditText.setText(String.valueOf(car.getWeekPrice()));
+            mMonthPriceEditText.setText(String.valueOf(car.getMonthPrice()));
+            mDayPrice = String.valueOf(car.getDayPrice());
+            mWeekPrice = String.valueOf(car.getWeekPrice());
+            mMonthPrice = String.valueOf(car.getMonthPrice());
+            List<String> photoUrls = new ArrayList<>();
+            for (Photo photo : car.getPhotos()) {
+                photoUrls.add(photo.getImage600x360());
+            }
+            PagerAdapter pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager(), photoUrls);
+            mViewPager.setAdapter(pagerAdapter);
+            if (mCarCounter < mProfilePresenter.getGetCarsResponse().getResponse().getItems().size() - 1) {
+                mCarCounter++;
+            } else {
+                mCarCounter = 0;
+            }
         }
     }
 
