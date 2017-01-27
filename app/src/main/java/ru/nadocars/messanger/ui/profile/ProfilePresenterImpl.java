@@ -197,65 +197,72 @@ public class ProfilePresenterImpl implements ProfilePresenter {
 
     @Override
     public void uploadAvatar(String token, String uri, final boolean restartActivityOnSuccess) {
-        File file = new File(uri);
-        RequestBody requestFile = RequestBody.create(MediaType.parse(MimeTypeMap.getSingleton()
-                .getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(uri))), file);
-        MultipartBody.Part body = MultipartBody.Part.createFormData("avatar", file.getName(),
-                requestFile);
-        RequestBody tokenBody = RequestBody.create(okhttp3.MultipartBody.FORM, token);
-        Call<ResponseBody> call = mHttpEndpointApi.uploadUserAvatar(tokenBody, body);
-        call.enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if (restartActivityOnSuccess) {
-                    if (null != mProfileView) {
-                        mProfileView.restartActivity();
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                System.out.println();
-            }
-        });
-    }
-
-    @Override
-    public void uploadCarPhoto(final String token, String carId, String uri, final boolean restartActivityOnSuccess) {
-        File file = new File(uri);
-        RequestBody requestFile = RequestBody.create(MediaType.parse(MimeTypeMap.getSingleton()
-                .getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(uri))), file);
-        MultipartBody.Part body = MultipartBody.Part.createFormData("photo1", file.getName(),
-                requestFile);
-        RequestBody tokenBody = RequestBody.create(okhttp3.MultipartBody.FORM, token);
-        RequestBody carIdBody = RequestBody.create(okhttp3.MultipartBody.FORM, carId);
-        Call<UploadPhotoResponse> call = mHttpEndpointApi.uploadCarPhoto(tokenBody, carIdBody, body);
-        call.enqueue(new Callback<UploadPhotoResponse>() {
-            @Override
-            public void onResponse(Call<UploadPhotoResponse> call, Response<UploadPhotoResponse> response) {
-                if (response.isSuccessful() && null != response.body()) {
+        if (null != token && token.length() > 0
+                && null != uri && uri.length() > 0) {
+            File file = new File(uri);
+            RequestBody requestFile = RequestBody.create(MediaType.parse(MimeTypeMap.getSingleton()
+                    .getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(uri))), file);
+            MultipartBody.Part body = MultipartBody.Part.createFormData("avatar", file.getName(),
+                    requestFile);
+            RequestBody tokenBody = RequestBody.create(okhttp3.MultipartBody.FORM, token);
+            Call<ResponseBody> call = mHttpEndpointApi.uploadUserAvatar(tokenBody, body);
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                     if (restartActivityOnSuccess) {
                         if (null != mProfileView) {
                             mProfileView.restartActivity();
                         }
-                    } else {
-                        if (null != mProfileView) {
-                            UploadPhotoResponse uploadPhotoResponse = response.body();
-                            mProfileView.setCarPhotoId(uploadPhotoResponse.getResponse().get(0).getId());
-                            mProfileView.showError("Фото загружено");
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    System.out.println();
+                }
+            });
+        }
+    }
+
+    @Override
+    public void uploadCarPhoto(final String token, String carId, String uri, final boolean restartActivityOnSuccess) {
+        if (null != token && token.length() > 0
+                && null != uri && uri.length() > 0
+                && null != carId && carId.length() > 0) {
+            File file = new File(uri);
+            RequestBody requestFile = RequestBody.create(MediaType.parse(MimeTypeMap.getSingleton()
+                    .getMimeTypeFromExtension(MimeTypeMap.getFileExtensionFromUrl(uri))), file);
+            MultipartBody.Part body = MultipartBody.Part.createFormData("photo1", file.getName(),
+                    requestFile);
+            RequestBody tokenBody = RequestBody.create(okhttp3.MultipartBody.FORM, token);
+            RequestBody carIdBody = RequestBody.create(okhttp3.MultipartBody.FORM, carId);
+            Call<UploadPhotoResponse> call = mHttpEndpointApi.uploadCarPhoto(tokenBody, carIdBody, body);
+            call.enqueue(new Callback<UploadPhotoResponse>() {
+                @Override
+                public void onResponse(Call<UploadPhotoResponse> call, Response<UploadPhotoResponse> response) {
+                    if (response.isSuccessful() && null != response.body()) {
+                        if (restartActivityOnSuccess) {
+                            if (null != mProfileView) {
+                                mProfileView.restartActivity();
+                            }
+                        } else {
+                            if (null != mProfileView) {
+                                UploadPhotoResponse uploadPhotoResponse = response.body();
+                                mProfileView.setCarPhotoId(uploadPhotoResponse.getResponse().get(0).getId());
+                                mProfileView.showError("Фото загружено");
+                            }
                         }
                     }
                 }
-            }
 
-            @Override
-            public void onFailure(Call<UploadPhotoResponse> call, Throwable t) {
-                if (null != mProfileView) {
-                    mProfileView.showError("Ошибка сервера");
+                @Override
+                public void onFailure(Call<UploadPhotoResponse> call, Throwable t) {
+                    if (null != mProfileView) {
+                        mProfileView.showError("Ошибка сервера");
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     @Override

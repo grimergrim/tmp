@@ -316,7 +316,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:text="Ford Focus 2011"
+                    tools:text="Ford Focus 2011"
                     android:textColor="@android:color/black"
                     android:textSize="16sp"
                     app:layout_constraintLeft_toLeftOf="parent"
@@ -346,7 +346,7 @@
                         android:paddingLeft="4dp"
                         android:paddingRight="4dp"
                         android:paddingStart="4dp"
-                        android:text="19 560"
+                        tools:text="19 560"
                         android:textAlignment="center"
                         android:textColor="@android:color/white"
                         android:textSize="16sp"/>
@@ -396,7 +396,7 @@
                         android:paddingLeft="4dp"
                         android:paddingRight="4dp"
                         android:paddingStart="4dp"
-                        android:text="19 560"
+                        tools:text="19 560"
                         android:textAlignment="center"
                         android:textColor="@android:color/white"
                         android:textSize="16sp"/>
@@ -446,7 +446,7 @@
                         android:paddingLeft="4dp"
                         android:paddingRight="4dp"
                         android:paddingStart="4dp"
-                        android:text="19 560"
+                        tools:text="19 560"
                         android:textAlignment="center"
                         android:textColor="@android:color/white"
                         android:textSize="16sp"/>

@@ -3,6 +3,7 @@ package ru.nadocars.messanger.ui.profile;
 import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
@@ -71,6 +73,10 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     protected static final int AVATAR_GALLERY_REQUEST = 1;
     protected static final int CAR_CAMERA_REQUEST = 2;
     protected static final int CAR_GALLERY_REQUEST = 3;
+//    private static final int MY_PERMISSIONS_REQUEST_CAMERA = 0;
+//    private static final int MY_PERMISSIONS_REQUEST_STORAGE = 1;
+//    private int cameraRequestCode;
+//    private int galleryRequestCode;
 
     private ProfilePresenter mProfilePresenter;
     private Navigator mNavigator;
@@ -601,6 +607,56 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         bundle.putInt("gallery request code", galleryRequestCode);
         getPictureDialogFragment.setArguments(bundle);
         getPictureDialogFragment.show(getSupportFragmentManager(), "Input email fragment");
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case AVATAR_CAMERA_REQUEST: {
+                if (grantResults.length > 0 && grantResults[0]
+                        == PackageManager.PERMISSION_GRANTED) {
+                    openCamera(AVATAR_CAMERA_REQUEST);
+                }
+                break;
+            }
+            case AVATAR_GALLERY_REQUEST: {
+                if (grantResults.length > 0 && grantResults[0]
+                        == PackageManager.PERMISSION_GRANTED) {
+                    openGallery(AVATAR_GALLERY_REQUEST);
+                }
+                break;
+            }
+            case CAR_CAMERA_REQUEST: {
+                if (grantResults.length > 0 && grantResults[0]
+                        == PackageManager.PERMISSION_GRANTED) {
+                    openCamera(CAR_CAMERA_REQUEST);
+                }
+                break;
+            }
+            case CAR_GALLERY_REQUEST: {
+                if (grantResults.length > 0 && grantResults[0]
+                        == PackageManager.PERMISSION_GRANTED) {
+                    openGallery(CAR_GALLERY_REQUEST);
+                }
+                break;
+            }
+        }
+    }
+
+    private void openCamera(int requestCode) {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        File f = new File(android.os.Environment.getExternalStorageDirectory(), "temp.jpg");
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
+        this.startActivityForResult(intent, requestCode);
+    }
+
+    private void openGallery(int requestCode) {
+        Intent pictureActionIntent;
+        pictureActionIntent = new Intent(Intent.ACTION_PICK,
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        this.startActivityForResult(pictureActionIntent, requestCode);
     }
 
     @Override
