@@ -128,9 +128,12 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     private Button mGoToWebButton;
     private Button mBackButton;
 
+    private boolean isFirstLounch;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        isFirstLounch = true;
         mProfilePresenter = ProfilePresenterImpl.getPreLoginPresenter();
         mProfilePresenter.setView(this);
         mNavigator = new NavigatorImpl();
@@ -1056,7 +1059,13 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
             PagerAdapter pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager(), photoUrls);
             mViewPager.setAdapter(pagerAdapter);
             if (mCarCounter < mProfilePresenter.getGetCarsResponse().getResponse().getItems().size() - 1) {
-                mCarCounter++;
+                if (isFirstLounch) {
+                    mCarCounter = 0;
+                    isFirstLounch = false;
+                } else {
+                    mCarCounter++;
+                }
+
             } else {
                 mCarCounter = 0;
             }
