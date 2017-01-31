@@ -270,7 +270,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
         mMonthPriceTitleTextView = (TextView) findViewById(R.id.month_price_title);
         mGoToWebButton = (Button) findViewById(R.id.go_to_web);
         mExitbutton = (Button) findViewById(R.id.exit_button);
-        mBackButton = (Button) findViewById(R.id.back_button);
+        mBackButton = (Button) findViewById(R.id.messenger);
     }
 
     private void setListeners() {

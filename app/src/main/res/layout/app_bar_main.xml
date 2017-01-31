@@ -33,7 +33,7 @@
                 android:layout_gravity="end"
                 android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
-                android:background="@drawable/ic_exit" />
+                android:background="@drawable/ic_exit_new" />
 
             <Button
                 android:id="@+id/check_interval"
@@ -42,7 +42,16 @@
                 android:layout_gravity="end"
                 android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
-                android:background="@drawable/ic_build" />
+                android:background="@drawable/ic_settings_new" />
+
+            <Button
+                android:id="@+id/messenger"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="end"
+                android:layout_marginEnd="8dp"
+                android:layout_marginRight="8dp"
+                android:background="@drawable/ic_messenger_new" />
 
             <ImageView
                 android:id="@+id/user_avatar"

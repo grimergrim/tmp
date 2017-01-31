@@ -85,6 +85,10 @@ public class DialogActivity extends AppCompatActivity implements DialogView, Dia
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+        Button backButton = (Button) findViewById(R.id.messenger);
+        if (backButton != null) {
+            backButton.setVisibility(View.GONE);
+        }
         if (settingsButton != null) {
             settingsButton.setVisibility(View.VISIBLE);
             settingsButton.setOnClickListener(new View.OnClickListener() {

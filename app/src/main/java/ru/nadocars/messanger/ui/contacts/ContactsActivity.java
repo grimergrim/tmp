@@ -62,6 +62,10 @@ public class ContactsActivity extends AppCompatActivity implements ContactsView,
                 }
             });
         }
+        Button backButton = (Button) findViewById(R.id.messenger);
+        if (backButton != null) {
+            backButton.setVisibility(View.GONE);
+        }
         if (userAvatar != null) {
             userAvatar.setVisibility(View.VISIBLE);
             setUserAvatarFromInternalMemory(userAvatar);

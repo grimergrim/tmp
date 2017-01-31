@@ -40,6 +40,7 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
         ImageView userAvatar = (ImageView) findViewById(R.id.user_avatar);
         Button exitbutton = (Button) findViewById(R.id.exit_button);
         Button settingsButton = (Button) findViewById(R.id.check_interval);
+        Button backButton = (Button) findViewById(R.id.messenger);
         if (settingsButton != null) {
             settingsButton.setVisibility(View.GONE);
         }
@@ -48,6 +49,9 @@ public class LoginActivity extends AppCompatActivity implements LoginView {
         }
         if (exitbutton != null) {
             exitbutton.setVisibility(View.GONE);
+        }
+        if (backButton != null) {
+            backButton.setVisibility(View.GONE);
         }
         emailView = (AutoCompleteTextView) findViewById(R.id.phone_number);
         passwordView = (EditText) findViewById(R.id.password);

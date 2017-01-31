@@ -254,24 +254,11 @@
                     android:id="@+id/next_car"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:background="@drawable/ic_change_car"
+                    android:background="@drawable/ic_next_new"
                     android:minHeight="40dp"
                     android:minWidth="40dp"
                     android:padding="8dp"
                     app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"/>
-
-                <Button
-                    android:id="@+id/back_button"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="@drawable/ic_message"
-                    android:minHeight="40dp"
-                    android:minWidth="40dp"
-                    android:padding="8dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginRight="8dp"
-                    app:layout_constraintRight_toLeftOf="@+id/next_car"
                     app:layout_constraintTop_toTopOf="parent"/>
 
                 <android.support.v4.view.ViewPager
