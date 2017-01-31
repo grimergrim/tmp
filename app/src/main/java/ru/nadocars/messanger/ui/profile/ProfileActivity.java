@@ -788,7 +788,7 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
     }
 
     private void sendCarPhotoToServer(String uri, boolean shouldRestartActivityOnSuccess) {
-        mProfilePresenter.uploadCarPhoto(mToken, mCurrentCarId, uri, shouldRestartActivityOnSuccess);
+        mProfilePresenter.uploadCarPhoto(mCarCounter, mToken, mCurrentCarId, uri, shouldRestartActivityOnSuccess);
     }
 
     private void addPhotoToList(String uri) {
@@ -1023,7 +1023,9 @@ public class ProfileActivity extends AppCompatActivity implements ProfileView {
                     photoList2.add(photoList.get(i));
                 }
             }
-            ((ScreenSlidePagerAdapter) mViewPager.getAdapter()).setPhotoList(photoList2);
+//            ((ScreenSlidePagerAdapter) mViewPager.getAdapter()).setPhotoList(photoList2);
+            PagerAdapter pagerAdapter = new ScreenSlidePagerAdapter(getSupportFragmentManager(), photoList2);
+            mViewPager.setAdapter(pagerAdapter);
             if (y > 0) {
                 mViewPager.setCurrentItem(y - 1);
             }

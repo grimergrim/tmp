@@ -7,6 +7,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 import java.io.File;
+import java.util.List;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -18,6 +19,7 @@ import retrofit2.Response;
 import ru.nadocars.messanger.api.HttpEndpointsApi;
 import ru.nadocars.messanger.http.RetrofitFactory;
 import ru.nadocars.messanger.json.car.GetCarsResponse;
+import ru.nadocars.messanger.json.car.Photo;
 import ru.nadocars.messanger.json.car.calendar.GetCarCalendarResponse;
 import ru.nadocars.messanger.json.car.photo.UploadPhotoResponse;
 import ru.nadocars.messanger.json.user.GetUserResponse;
@@ -211,7 +213,8 @@ public class ProfilePresenterImpl implements ProfilePresenter {
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                     if (restartActivityOnSuccess) {
                         if (null != mProfileView) {
-                            mProfileView.restartActivity();
+
+//                            mProfileView.restartActivity();
                         }
                     }
                 }
@@ -225,7 +228,7 @@ public class ProfilePresenterImpl implements ProfilePresenter {
     }
 
     @Override
-    public void uploadCarPhoto(final String token, String carId, String uri, final boolean restartActivityOnSuccess) {
+    public void uploadCarPhoto(final int carCounter, final String token, String carId, String uri, final boolean restartActivityOnSuccess) {
         if (null != token && token.length() > 0
                 && null != uri && uri.length() > 0
                 && null != carId && carId.length() > 0) {
@@ -243,7 +246,13 @@ public class ProfilePresenterImpl implements ProfilePresenter {
                     if (response.isSuccessful() && null != response.body()) {
                         if (restartActivityOnSuccess) {
                             if (null != mProfileView) {
-                                mProfileView.restartActivity();
+                                List<Photo> photos = mGetCarsResponse.getResponse().getItems().get(carCounter).getPhotos();
+                                Photo photo = new Photo();
+                                photo.setId(response.body().getResponse().get(0).getId());
+                                photos.add(photo);
+                                mGetCarsResponse.getResponse().getItems().get(carCounter).setPhotos(photos);
+
+//                                mProfileView.restartActivity();
                             }
                         } else {
                             if (null != mProfileView) {
